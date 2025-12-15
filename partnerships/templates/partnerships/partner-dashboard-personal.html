@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de Bord - {{ partner.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .dashboard-header {
+        margin-bottom: 40px;
+        padding: 40px;
+        background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
+        color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(19, 141, 115, 0.2);
+    }
+
+    .dashboard-header h1 {
+        font-size: 32px;
+        font-weight: 300;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .dashboard-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border-left: 5px solid #138d73;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-4px);
+    }
+
+    .stat-card h3 {
+        color: #999;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 12px 0;
+    }
+
+    .stat-card .value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #138d73;
+        margin: 0 0 8px 0;
+    }
+
+    .stat-card .unit {
+        font-size: 13px;
+        color: #666;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .stat-card.highlight {
+        border-left-color: #27ae60;
+        background: linear-gradient(135deg, #f0f9f7 0%, #ffffff 100%);
+    }
+
+    .stat-card.highlight .value {
+        color: #27ae60;
+    }
+
+    .stat-card.highlight h3 {
+        color: #27ae60;
+    }
+
+    .divider {
+        height: 2px;
+        background: #eee;
+        margin: 40px 0;
+    }
+
+    .section {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .section:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 3px solid #138d73;
+    }
+
+    .section h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: #1a1a1a;
+    }
+
+    .section-badge {
+        background: #f0f9f7;
+        color: #138d73;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #f8f8f8;
+        border-bottom: 2px solid #eee;
+    }
+
+    th {
+        padding: 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    td {
+        padding: 14px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+    }
+
+    tbody tr {
+        transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background: #fafafa;
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .empty-message svg {
+        width: 48px;
+        height: 48px;
+        opacity: 0.3;
+        margin-bottom: 16px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-paid {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-converted {
+        background: #c8e6c9;
+        color: #1b5e20;
+    }
+
+    .status-partial {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-unconverted {
+        background: #e0e0e0;
+        color: #424242;
+    }
+
+    .logout-section {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid #eee;
+    }
+
+    .logout-btn {
+        display: inline-block;
+        padding: 12px 32px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+    }
+
+    .amount {
+        font-weight: 600;
+        color: #138d73;
+    }
+
+    .amount.warning {
+        color: #e67e22;
+    }
+
+    .amount.danger {
+        color: #e74c3c;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 24px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 24px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section {
+            padding: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ partner.name }} ({{ partner.get_partner_type_display }})</h1>
+            <p>Tableau de bord personnel - Suivi de vos étudiants et paiements</p>
+        </div>
+        <a href="{% url 'partner-codes' %}" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.3s ease; display: inline-block; white-space: nowrap;">Mon Code</a>
+    </div>
+
+    <!-- Guide des statistiques -->
+    <div style="background: #f0f9f7; border-left: 5px solid #138d73; padding: 20px; border-radius: 12px; margin-bottom: 30px;">
+        <h3 style="margin: 0 0 12px 0; color: #138d73; font-size: 14px; font-weight: 600;">Comprendre Vos Statistiques</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 12px;">
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">À confirmer</div>
+                <div style="color: #666;">Nombre d'étudiants inscrits mais non confirmés</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Depuis checkpoint</div>
+                <div style="color: #666;">Étudiants confirmés APRÈS le dernier paiement (réinitialise à 0)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu à encaisser</div>
+                <div style="color: #666;">Montant que vous devriez percevoir depuis le dernier checkpoint</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Total confirmés</div>
+                <div style="color: #666;">Nombre TOTAL d'étudiants confirmés depuis le début</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu total</div>
+                <div style="color: #666;">Montant TOTAL gagné = Total confirmés × Commission</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Montant à recevoir</div>
+                <div style="color: #666;">Ce qui vous reste à recevoir = Revenu total - Total payé</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards - Depuis Checkpoint -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="margin: 0 0 16px 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">Depuis le Dernier Checkpoint</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>À confirmer</h3>
+                <div class="value" style="color: #138d73;">{{ pending_count }}</div>
+                <div class="unit">Étudiants en attente</div>
+            </div>
+
+            <div class="stat-card highlight">
+                <h3>Depuis checkpoint</h3>
+                <div class="value">{{ students_since_checkpoint }}</div>
+                <div class="unit">Étudiants confirmés</div>
+            </div>
+
+            <div class="stat-card highlight">
+                <h3>À encaisser</h3>
+                <div class="value"><span class="amount">{{ revenue_since_checkpoint|floatformat:0 }}</span> DA</div>
+                <div class="unit">{{ students_since_checkpoint }} × {{ partner.commission_per_student }} DA</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards - Total -->
+    <div style="margin-bottom: 30px;">
+        <h3 style="margin: 0 0 16px 0; color: #1a1a1a; font-size: 16px; font-weight: 600;">Bilan Total (Depuis le Début)</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total confirmés</h3>
+                <div class="value" style="color: #27ae60;">{{ total_all_time_confirmed }}</div>
+                <div class="unit">Étudiants confirmés (total)</div>
+            </div>
+
+            <div class="stat-card highlight">
+                <h3>Revenu total</h3>
+                <div class="value"><span class="amount">{{ total_revenue_all_time|floatformat:0 }}</span> DA</div>
+                <div class="unit">Montant total gagné</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Total payé</h3>
+                <div class="value" style="color: #138d73;">{{ total_paid_all_checkpoints|floatformat:0 }} DA</div>
+                <div class="unit">Somme de tous les paiements</div>
+            </div>
+
+            <div class="stat-card highlight" style="{% if total_remaining_payment < 0 %}border-left-color: #e74c3c; background: linear-gradient(135deg, #ffe6e6 0%, #ffffff 100%);{% endif %}">
+                <h3 style="{% if total_remaining_payment < 0 %}color: #e74c3c;{% endif %}">Solde</h3>
+                <div class="value" style="{% if total_remaining_payment < 0 %}color: #e74c3c;{% else %}color: #27ae60;{% endif %}">
+                    {% if total_remaining_payment < 0 %}
+                        {{ total_remaining_payment|add:0|floatformat:0 }} DA
+                    {% else %}
+                        {{ total_remaining_payment|floatformat:0 }} DA
+                    {% endif %}
+                </div>
+                <div class="unit">
+                    {% if total_remaining_payment > 0 %}
+                        Montant que vous devez percevoir
+                    {% elif total_remaining_payment < 0 %}
+                        Montant que vous devez rembourser
+                    {% else %}
+                        Compte régularisé
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkpoints History -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Historique des Paiements</h2>
+            <span class="section-badge">{{ partner.payment_checkpoints.all|length }} paiement(s)</span>
+        </div>
+
+        {% if partner.payment_checkpoints.all %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date du Paiement</th>
+                            <th style="text-align: right;">Montant Payé</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for checkpoint in partner.payment_checkpoints.all %}
+                            <tr>
+                                <td><strong>{{ checkpoint.checkpoint_date|date:"d/m/Y à H:i" }}</strong></td>
+                                <td style="text-align: right; color: #27ae60; font-weight: 600;">{{ checkpoint.amount_paid|floatformat:0 }} DA</td>
+                                <td>{{ checkpoint.notes|truncatewords:10 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <p>Aucun paiement enregistré pour le moment.</p>
+                <p style="color: #bbb; margin-top: 12px;">Les checkpoints de paiement apparaîtront ici une fois traités.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Codes Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Vos Codes</h2>
+            <span class="section-badge">{{ partnership_codes|length }} code(s)</span>
+        </div>
+
+        {% if partnership_codes %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th style="text-align: center;">En Attente</th>
+                            <th style="text-align: center;">Confirmés</th>
+                            <th style="text-align: right;">Montant Acquis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code in partnership_codes %}
+                            {% with pending=code.students_count confirmed=code.confirmed_count %}
+                                <tr>
+                                    <td><strong style="font-family: monospace; color: #1a9b7f;">{{ code.code }}</strong></td>
+                                    <td style="text-align: center; color: #e67e22;">{{ pending }}</td>
+                                    <td style="text-align: center; color: #27ae60;">{{ confirmed }}</td>
+                                    <td style="text-align: right; color: #27ae60; font-weight: 600;">{{ code.total_earned|floatformat:0 }} DA</td>
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <p>Aucun code associé pour le moment.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Students Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Étudiants Inscrits</h2>
+            <span class="section-badge">{{ students|length }} étudiant(s)</span>
+        </div>
+
+        {% if students %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Programme</th>
+                            <th>Date d'inscription</th>
+                            <th>Conversion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td><strong>{{ student.full_name }}</strong></td>
+                                <td style="color: #666;">{{ student.email }}</td>
+                                <td>{{ student.phone }}</td>
+                                <td>{{ student.program.name }}</td>
+                                <td>{{ student.enrollment_date|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if student.converted %}
+                                        <span class="status-badge status-converted">Converti</span>
+                                    {% else %}
+                                        <span class="status-badge status-unconverted">En attente</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <p>Aucun étudiant inscrit pour le moment.</p>
+                <p style="color: #bbb; margin-top: 12px;">Les inscriptions apparaîtront ici une fois reçues.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Payments Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Historique des Paiements</h2>
+            <a href="{% url 'partner-payment-history' %}" class="logout-btn" style="background: #138d73; text-transform: none; border-radius: 8px;">Voir l'historique complet</a>
+        </div>
+
+        {% if payments %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th>Montant Restant</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td><strong class="amount">{{ payment.amount|floatformat:0 }} DA</strong></td>
+                                <td>
+                                    {% if payment.status == 'completed' %}
+                                        <span class="status-badge status-paid">Payé</span>
+                                    {% elif payment.status == 'partial' %}
+                                        <span class="status-badge status-partial">Partiel</span>
+                                    {% else %}
+                                        <span class="status-badge status-pending">En attente</span>
+                                    {% endif %}
+                                </td>
+                                <td class="amount">{{ payment.remaining_amount|floatformat:0 }} DA</td>
+                                <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <p>Aucun paiement enregistré pour le moment.</p>
+                <p style="color: #bbb; margin-top: 12px;">Les paiements s'afficheront ici dès qu'ils seront générés.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Logout Section -->
+    <div class="logout-section">
+        <a href="{% url 'partner-logout' %}" class="logout-btn">Se déconnecter</a>
+    </div>
+</div>
+
+{% endblock %}

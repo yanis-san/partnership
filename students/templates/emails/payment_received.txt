@@ -1,0 +1,18 @@
+Bonjour {{ partner.name }},
+
+✅ Votre paiement a été reçu et validé!
+
+Détails:
+- Montant reçu: {{ payment.amount|floatformat:0 }} DA
+- Date de paiement: {{ payment.completed_at|date:"d/m/Y à H:i" }}
+- Référence: {{ payment.id }}
+
+Nouveau solde restant dû: {{ new_balance|floatformat:0 }} DA
+
+Consultez votre historique complet des paiements:
+https://yourdomain.com/partnerships/payment-history/
+
+Merci pour votre paiement!
+
+Cordialement,
+L'équipe Affiliation

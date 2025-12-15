@@ -1,0 +1,19 @@
+Bienvenue {{ student.full_name }}!
+
+Votre inscription a bien été reçue.
+
+Détails de votre inscription:
+- Nom: {{ student.full_name }}
+- Email: {{ student.email }}
+- Téléphone: {{ student.phone }}
+- Programme: {{ student.program.name }}
+- Partenaire: {{ student.library.name }}
+- Date d'inscription: {{ student.enrollment_date|date:"d/m/Y H:i" }}
+
+Votre inscription est actuellement en attente de confirmation par notre équipe.
+Vous recevrez une notification dès qu'elle sera validée.
+
+Merci de votre intérêt pour notre école!
+
+Cordialement,
+L'équipe d'affiliation

@@ -1,0 +1,28 @@
+<tr id="student-{{ student.id }}"
+    hx-target="this"
+    hx-swap="outerHTML">
+    <td class="student-name">{{ student.full_name }}</td>
+    <td>{{ student.email }}</td>
+    <td>{{ student.program.name }}</td>
+    <td>{{ student.enrollment_date|date:"d/m/Y" }}</td>
+    <td>
+        {% if student.is_confirmed %}
+            <span class="status-badge status-confirmed">✅ Confirmé</span>
+        {% else %}
+            <span class="status-badge status-pending">⏳ En Attente</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if not student.is_confirmed %}
+            <button class="btn-confirm"
+                hx-post="{% url 'confirm-student-htmx' student.id %}"
+                hx-indicator="#indicator-{{ student.id }}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                <span id="indicator-{{ student.id }}" class="htmx-indicator">...</span>
+                Confirmer
+            </button>
+        {% else %}
+            <span style="color: #999; font-size: 12px;">Confirmé</span>
+        {% endif %}
+    </td>
+</tr>

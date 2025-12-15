@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}{{ partner.name }} - Admin{% endblock %}
+
+{% block content %}
+<style>
+    .admin-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 24px;
+        padding: 8px 16px;
+        background: #f0f0f0;
+        color: #1a1a1a;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+        background: #e0e0e0;
+    }
+
+    .partner-header {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .partner-header h1 {
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+        color: #1a1a1a;
+    }
+
+    .partner-header p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+    }
+
+    .stat-box {
+        background: #f8f9fa;
+        padding: 16px;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a9b7f;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .section {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .section h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #1a9b7f;
+        color: #1a1a1a;
+    }
+
+    .student-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .student-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+    .student-item:last-child {
+        border-bottom: none;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #1a1a1a;
+        flex: 1;
+    }
+
+    .student-email {
+        color: #666;
+        font-size: 12px;
+        flex: 1;
+    }
+
+    .student-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .btn-confirm {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        margin-left: 8px;
+    }
+
+    .btn-confirm:hover {
+        background: #229954;
+    }
+
+    .checkpoint-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .checkpoint-item {
+        display: grid;
+        grid-template-columns: 1fr 1fr 2fr;
+        gap: 16px;
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+    .checkpoint-item:last-child {
+        border-bottom: none;
+    }
+
+    .checkpoint-date {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .checkpoint-amount {
+        text-align: right;
+        font-weight: 700;
+        color: #27ae60;
+    }
+
+    .checkpoint-notes {
+        color: #666;
+        font-size: 13px;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .info-box {
+        background: #f0f9f7;
+        border-left: 4px solid #1a9b7f;
+        padding: 16px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .info-box h3 {
+        margin: 0 0 8px 0;
+        color: #1a9b7f;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .info-box p {
+        margin: 4px 0;
+        color: #666;
+        font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .checkpoint-item {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="admin-container">
+    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+        <a href="{% url 'admin-partners-management' %}" class="back-link">← Retour à la gestion</a>
+        <a href="{% url 'admin-partner-codes' partner.id %}" class="back-link" style="background: #1a9b7f; color: white;">📱 Codes</a>
+    </div>
+
+    <!-- Guide des statistiques -->
+    <div style="background: #f0f9f7; border-left: 4px solid #1a9b7f; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+        <h3 style="margin: 0 0 12px 0; color: #1a9b7f; font-size: 14px; font-weight: 600;">Guide des Statistiques</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 12px;">
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Étudiants à confirmer</div>
+                <div style="color: #666;">Nombre d'étudiants inscrits mais non confirmés</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Confirmés depuis checkpoint</div>
+                <div style="color: #666;">Nouveaux étudiants confirmés APRÈS le dernier paiement (réinitialise à 0)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu à payer (depuis checkpoint)</div>
+                <div style="color: #666;">Montant qui doit être payé pour les nouveaux confirmés</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Total confirmés</div>
+                <div style="color: #666;">Nombre TOTAL d'étudiants confirmés depuis le début</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu total gagné</div>
+                <div style="color: #666;">Montant TOTAL = Total confirmés × Commission par étudiant</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Total payé</div>
+                <div style="color: #666;">Somme de TOUS les checkpoints (paiements effectués)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Reste à payer</div>
+                <div style="color: #666;">Différence = Revenu total - Total payé (négatif = surpayé)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="partner-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+            <div>
+                <h1>{{ partner.name }}</h1>
+                <p>{{ partner.get_partner_type_display }} • {{ partner.email }} • {{ partner.phone }}</p>
+            </div>
+            <div style="text-align: right; white-space: nowrap;">
+                <div style="font-size: 28px; font-weight: 700; color: #27ae60; margin-bottom: 4px;">{{ total_paid_all_checkpoints|floatformat:0 }} DA</div>
+                <div style="font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Total Payé</div>
+            </div>
+        </div>
+
+        <div class="stats-grid" style="margin-top: 20px;">
+            <div class="stat-box">
+                <div class="stat-value">{{ pending_count }}</div>
+                <div class="stat-label">Étudiants en attente</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ confirmed_count }}</div>
+                <div class="stat-label">Étudiants confirmés</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ partner.revenue_estimated|floatformat:0 }} DA</div>
+                <div class="stat-label">Revenu depuis dernier checkpoint</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Info -->
+    <div class="section">
+        <h2>Revenus Depuis le Dernier Checkpoint</h2>
+
+        <div class="stats-grid" style="margin-bottom: 20px;">
+            <div class="stat-box">
+                <div class="stat-value">{{ students_since_checkpoint }}</div>
+                <div class="stat-label">Étudiants confirmés (depuis checkpoint)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ revenue_since_checkpoint|floatformat:0 }} DA</div>
+                <div class="stat-label">Revenu à payer (depuis checkpoint)</div>
+            </div>
+        </div>
+
+        {% if partner.get_last_checkpoint %}
+            <div class="info-box">
+                <h3>Dernier checkpoint</h3>
+                <p>
+                    <strong>{{ partner.get_last_checkpoint.checkpoint_date|date:"d/m/Y à H:i" }}</strong>
+                    • {{ partner.get_last_checkpoint.amount_paid|floatformat:0 }} DA
+                    {% if partner.get_last_checkpoint.notes %}
+                        • {{ partner.get_last_checkpoint.notes }}
+                    {% endif %}
+                </p>
+            </div>
+        {% else %}
+            <div class="info-box">
+                <h3>Aucun checkpoint</h3>
+                <p>Aucun paiement n'a encore été créé pour ce partenaire.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Total Balance -->
+    <div class="section">
+        <h2>Bilan Total (Depuis le Début)</h2>
+
+        <div class="stats-grid" style="margin-bottom: 20px;">
+            <div class="stat-box">
+                <div class="stat-value">{{ total_all_time_confirmed }}</div>
+                <div class="stat-label">Étudiants confirmés (total)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ total_revenue_all_time|floatformat:0 }} DA</div>
+                <div class="stat-label">Revenu total gagné</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">{{ total_paid_all_checkpoints|floatformat:0 }} DA</div>
+                <div class="stat-label">Total payé (tous checkpoints)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" style="{% if total_remaining_payment < 0 %}color: #e74c3c;{% endif %}">
+                    {% if total_remaining_payment < 0 %}
+                        {{ total_remaining_payment|add:0|floatformat:0 }} DA
+                    {% else %}
+                        {{ total_remaining_payment|floatformat:0 }} DA
+                    {% endif %}
+                </div>
+                <div class="stat-label">Reste à payer</div>
+            </div>
+        </div>
+
+        {% if total_remaining_payment < 0 %}
+            <div class="info-box" style="background: #fee; border-left-color: #e74c3c;">
+                <h3 style="color: #e74c3c;">Attention - Surpaiement détecté</h3>
+                <p>
+                    Vous avez payé <strong>{{ total_remaining_payment|add:0|floatformat:0 }} DA</strong> en plus du montant nécessaire.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pending Students -->
+    {% if pending_students %}
+        <div class="section">
+            <h2>Étudiants à confirmer ({{ pending_count }})</h2>
+            <ul class="student-list">
+                {% for student in pending_students %}
+                    <li class="student-item" id="student-{{ student.id }}">
+                        <div>
+                            <div class="student-name">{{ student.full_name }}</div>
+                            <div class="student-email">{{ student.email }}</div>
+                        </div>
+                        <span class="student-status status-pending">En attente</span>
+                        <button class="btn-confirm" onclick="confirmStudent('{{ student.id }}', '{{ student.full_name }}')">
+                            ✅ Confirmer
+                        </button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Confirmed Students -->
+    {% if confirmed_students %}
+        <div class="section">
+            <h2>Étudiants confirmés ({{ confirmed_count }})</h2>
+            <ul class="student-list">
+                {% for student in confirmed_students %}
+                    <li class="student-item">
+                        <div>
+                            <div class="student-name">{{ student.full_name }}</div>
+                            <div class="student-email">{{ student.email }}</div>
+                        </div>
+                        <span class="student-status status-confirmed">✅ Confirmé</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Checkpoints History -->
+    {% if checkpoints %}
+        <div class="section">
+            <h2>Historique des checkpoints ({{ checkpoints|length }})</h2>
+            <ul class="checkpoint-list">
+                {% for checkpoint in checkpoints %}
+                    <li class="checkpoint-item">
+                        <div class="checkpoint-date">{{ checkpoint.checkpoint_date|date:"d/m/Y à H:i" }}</div>
+                        <div class="checkpoint-amount">{{ checkpoint.amount_paid|floatformat:0 }} DA</div>
+                        <div class="checkpoint-notes">{{ checkpoint.notes|default:"—" }}</div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <div class="section">
+            <h2>Historique des checkpoints</h2>
+            <div class="empty-message">
+                Aucun checkpoint enregistré pour le moment.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function confirmStudent(studentId, studentName) {
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+        fetch(`/partnerships/admin/confirm-student/${studentId}/`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const studentItem = document.getElementById(`student-${studentId}`);
+                studentItem.style.opacity = '0.5';
+                showMessage(`✅ ${studentName} confirmé`);
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showMessage('Erreur: ' + (data.error || 'Erreur inconnue'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Erreur: ' + error.message, 'error');
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showMessage(text, type = 'success') {
+        const message = document.createElement('div');
+        message.className = `message ${type}`;
+        message.textContent = text;
+        message.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 9999;
+            ${type === 'success' ? 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;' : 'background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;'}
+        `;
+        document.body.appendChild(message);
+        setTimeout(() => message.remove(), 3000);
+    }
+</script>
+
+{% endblock %}

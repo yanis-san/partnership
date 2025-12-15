@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Code - {{ partner.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .codes-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .codes-header {
+        margin-bottom: 40px;
+        padding: 40px;
+        background: linear-gradient(135deg, #1a9b7f 0%, #158b71 100%);
+        color: white;
+        border-radius: 8px;
+    }
+
+    .codes-header h1 {
+        font-size: 32px;
+        font-weight: 300;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .codes-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .codes-grid {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .code-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .code-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .code-card-header {
+        background: linear-gradient(135deg, #1a9b7f 0%, #158b71 100%);
+        color: white;
+        padding: 16px;
+        border-bottom: none;
+    }
+
+    .code-card-header h3 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .code-card-content {
+        padding: 24px;
+        text-align: center;
+    }
+
+    .code-display {
+        font-family: 'Courier New', monospace;
+        font-size: 32px;
+        font-weight: bold;
+        color: #1a9b7f;
+        margin: 0 0 24px 0;
+        letter-spacing: 4px;
+        word-break: break-all;
+    }
+
+    .qr-code-container {
+        margin: 24px 0;
+        padding: 24px;
+        background: #f8f8f8;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .qr-code-container img {
+        max-width: 100%;
+        height: auto;
+        max-height: 250px;
+    }
+
+    .code-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
+        padding: 16px 0;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+    }
+
+    .code-stat {
+        text-align: center;
+    }
+
+    .code-stat-label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .code-stat-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a9b7f;
+    }
+
+    .code-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-primary {
+        background: #1a9b7f;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #158b71;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(26, 155, 127, 0.25);
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        color: #999;
+    }
+
+    .empty-message p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 24px;
+        padding: 8px 16px;
+        background: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+        background: #e0e0e0;
+        transform: translateX(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .codes-header {
+            padding: 24px;
+        }
+
+        .codes-header h1 {
+            font-size: 24px;
+        }
+
+        .codes-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .code-display {
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        .code-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="codes-container">
+    <!-- Header -->
+    <div class="codes-header">
+        <h1>Mon Code</h1>
+        <p>Votre code partenaire et code QR pour partager avec vos étudiants</p>
+    </div>
+
+    <!-- Back Link -->
+    <a href="{% url 'partner-dashboard-personal' %}" class="back-link">← Retour au tableau de bord</a>
+
+    <!-- Codes Grid -->
+    {% if codes %}
+        <div class="codes-grid">
+            {% for code in codes %}
+                <div class="code-card">
+                    <div class="code-card-header">
+                        <h3>Code Actif</h3>
+                    </div>
+                    <div class="code-card-content">
+                        <!-- Code Display -->
+                        <div class="code-display">{{ code.code }}</div>
+
+                        <!-- QR Code -->
+                        <div class="qr-code-container">
+                            <!-- Generate QR code pointing to registration with code pre-filled -->
+                            {% url 'student-register' as registration_url %}
+                            {% with registration_link=registration_url|add:"?code="|add:code.code %}
+                            <a href="{{ registration_link }}" style="display: flex; justify-content: center; align-items: center;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ registration_link|urlencode }}" alt="QR Code for {{ code.code }}" />
+                            </a>
+                            {% endwith %}
+                        </div>
+
+                        <!-- Code Statistics -->
+                        <div class="code-stats">
+                            <div class="code-stat">
+                                <div class="code-stat-label">En Attente</div>
+                                <div class="code-stat-value">{{ code.students.filter_by_status|default:0 }}</div>
+                            </div>
+                            <div class="code-stat">
+                                <div class="code-stat-label">Confirmés</div>
+                                <div class="code-stat-value">{{ code.confirmed_count|default:0 }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="code-actions">
+                            <a href="{% url 'generate-code-pdf' code.id %}" class="btn btn-primary" target="_blank">
+                                PDF
+                            </a>
+                            <button class="btn btn-secondary" onclick="copyToClipboard('{{ code.code }}')">
+                                Copier
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-message">
+            <p>Vous n'avez pas encore de codes partenaires.</p>
+            <p style="color: #bbb; margin-top: 12px;">Vos codes apparaîtront ici une fois assignés par l'administrateur.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Code copié dans le presse-papiers!');
+        }, function(err) {
+            console.error('Erreur lors de la copie:', err);
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+Bonjour {{ partner.name }},
+
+💳 Un paiement a été créé dans le système!
+
+Détails du paiement:
+- Montant: {{ payment.amount|floatformat:0 }} DA
+- Référence: {{ payment.id }}
+- Date: {% now "d/m/Y à H:i" %}
+- Statut: En attente de validation
+
+Veuillez consulter votre historique de paiements pour confirmer les détails:
+{{ receipt_url }}
+
+Merci pour votre contribution!
+
+Cordialement,
+L'équipe Affiliation

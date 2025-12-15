@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Devenir Partenaire - Affiliation IRL{% endblock %}
+
+{% block content %}
+<style>
+    .contact-hero {
+        padding: 40px 20px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .contact-hero h1 {
+        font-size: 36px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+        color: #1a1a1a;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 12px;
+    }
+
+    .contact-hero h1::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #1a9b7f, transparent);
+        border-radius: 2px;
+    }
+
+    .contact-hero p {
+        font-size: 16px;
+        color: #666;
+        margin: 16px 0 0 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+
+    .contact-form-container {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    .form-control::placeholder {
+        color: #999;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 14px 32px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(231, 76, 60, 0.2);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .form-group.error .form-control {
+        border-color: #e74c3c;
+    }
+
+    .info-section {
+        background: #f8f9fa;
+        padding: 24px;
+        border-radius: 8px;
+        margin-top: 40px;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .info-section h3 {
+        margin-top: 0;
+        color: #1a1a1a;
+        font-size: 18px;
+    }
+
+    .info-section p {
+        color: #666;
+        margin: 8px 0;
+        line-height: 1.6;
+    }
+
+    .check-list {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0;
+    }
+
+    .check-list li {
+        padding: 8px 0;
+        color: #666;
+        padding-left: 24px;
+        position: relative;
+    }
+
+    .check-list li:before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+    .success-badge {
+        display: inline-block;
+        background: #27ae60;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .contact-hero h1 {
+            font-size: 32px;
+        }
+
+        .contact-form-container {
+            padding: 24px;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+        }
+    }
+
+    .errorlist {
+        color: #e74c3c;
+        list-style: none;
+        padding: 0;
+        margin: 0 0 12px 0;
+    }
+
+    .errorlist li {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="contact-hero">
+    <h1>Devenir Partenaire</h1>
+    <p>Gagnez des commissions en partageant votre QR code avec nos étudiants</p>
+</div>
+
+<!-- Contact Form -->
+<div class="contact-form-container">
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Nom du commerce -->
+        <div class="form-group {% if form.business_name.errors %}error{% endif %}">
+            <label for="{{ form.business_name.id_for_label }}">{{ form.business_name.label }}</label>
+            {{ form.business_name }}
+            {% if form.business_name.errors %}
+                <div class="error-message">{{ form.business_name.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Type de commerce -->
+        <div class="form-group {% if form.business_type.errors %}error{% endif %}">
+            <label for="{{ form.business_type.id_for_label }}">{{ form.business_type.label }}</label>
+            {{ form.business_type }}
+            {% if form.business_type.errors %}
+                <div class="error-message">{{ form.business_type.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div class="form-group {% if form.email.errors %}error{% endif %}">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="error-message">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Téléphone -->
+        <div class="form-group {% if form.phone.errors %}error{% endif %}">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+                <div class="error-message">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Adresse -->
+        <div class="form-group {% if form.address.errors %}error{% endif %}">
+            <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+            {{ form.address }}
+            {% if form.address.errors %}
+                <div class="error-message">{{ form.address.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Message -->
+        <div class="form-group {% if form.message.errors %}error{% endif %}">
+            <label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>
+            {{ form.message }}
+            {% if form.message.errors %}
+                <div class="error-message">{{ form.message.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit">Envoyer ma demande</button>
+    </form>
+</div>
+
+<!-- Info Section -->
+<div class="info-section">
+    <h3>Qu'est-ce qui se passe ensuite?</h3>
+    <ul class="check-list">
+        <li>Nous recevons votre demande et la traitons dans les 24-48h</li>
+        <li>Nous vous contactons pour finaliser les détails</li>
+        <li>Vous recevez votre code unique et QR code</li>
+        <li>Les étudiants commencent à scanner</li>
+        <li>Vous gagnez automatiquement vos commissions</li>
+    </ul>
+
+    <h3 style="margin-top: 24px;">Pourquoi nous rejoindre?</h3>
+    <ul class="check-list">
+        <li>Aucune installation compliquée</li>
+        <li>Revenus automatiques et prévisibles</li>
+        <li>Dashboard pour suivre vos performances</li>
+        <li>Support dédié</li>
+        <li>Paiements directs et transparents</li>
+    </ul>
+</div>
+
+{% endblock %}

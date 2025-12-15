@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Partenaire - {{ partner.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📊 Dashboard - {{ partner.name }}</h2>
+    <p style="color: #666; margin-bottom: 20px;">Code partenaire: <code style="background: #f5f5f5; padding: 4px 8px; border-radius: 3px;">{{ partner.partner_code }}</code></p>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ total_students }}</h3>
+        <p>Élèves parrainés</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_earned|floatformat:0 }} DA</h3>
+        <p>Montant généré</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_paid|floatformat:0 }} DA</h3>
+        <p>Montant payé</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ remaining_balance|floatformat:0 }} DA</h3>
+        <p>Solde à recevoir</p>
+    </div>
+</div>
+
+<div class="row">
+    <div style="flex: 2;">
+        <div class="card">
+            <h3>Élèves parrainés</h3>
+            {% if students %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Niveau</th>
+                            <th>Date d'inscription</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td>{{ student.full_name }}</td>
+                                <td>{{ student.email }}</td>
+                                <td>{{ student.get_level_display }}</td>
+                                <td>{{ student.enrollment_date|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if student.status == 'active' %}
+                                        <span class="badge badge-success">Actif</span>
+                                    {% elif student.status == 'inactive' %}
+                                        <span class="badge badge-warning">Inactif</span>
+                                    {% else %}
+                                        <span class="badge badge-danger">Suspendu</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #999; text-align: center; padding: 40px 20px;">
+                    Aucun élève parrainé pour le moment. Partagez votre code pour commencer à gagner des commissions !
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div style="flex: 1;">
+        <div class="card">
+            <h3>Statut de paiement</h3>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 4px; text-align: center;">
+                <p style="color: #999; font-size: 14px; margin-bottom: 10px;">Statut actuel</p>
+                {% if payment_status == "Payé" %}
+                    <span class="badge badge-success" style="font-size: 16px; padding: 10px 20px;">✅ {{ payment_status }}</span>
+                {% elif payment_status == "Partiel" %}
+                    <span class="badge badge-warning" style="font-size: 16px; padding: 10px 20px;">⏳ {{ payment_status }}</span>
+                {% else %}
+                    <span class="badge badge-info" style="font-size: 16px; padding: 10px 20px;">Ɐ️ {{ payment_status }}</span>
+                {% endif %}
+            </div>
+
+            <h4 style="margin-top: 25px; margin-bottom: 15px;">Résumé financier</h4>
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 4px; line-height: 2;">
+                <p style="display: flex; justify-content: space-between;">
+                    <span>Commission/élève:</span>
+                    <strong>{{ partner.commission_per_student|floatformat:0 }} DA</strong>
+                </p>
+                <p style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 10px;">
+                    <span>Total généré:</span>
+                    <strong>{{ total_earned|floatformat:0 }} DA</strong>
+                </p>
+                <p style="display: flex; justify-content: space-between;">
+                    <span>Total payé:</span>
+                    <strong style="color: #28a745;">{{ total_paid|floatformat:0 }} DA</strong>
+                </p>
+                <p style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 10px; font-size: 16px;">
+                    <span>À recevoir:</span>
+                    <strong style="color: #667eea;">{{ remaining_balance|floatformat:0 }} DA</strong>
+                </p>
+            </div>
+
+            <h4 style="margin-top: 25px; margin-bottom: 15px;">Vos codes</h4>
+            {% if partnership_codes %}
+                <div style="background: #d1ecf1; padding: 15px; border-radius: 4px; border: 1px solid #bee5eb;">
+                    {% for code in partnership_codes %}
+                        <p style="margin: 10px 0; word-break: break-all;">
+                            <code style="background: white; padding: 4px 8px; border-radius: 3px; font-size: 14px;">{{ code.code }}</code>
+                        </p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h3>ℹ️ Information</h3>
+            <p style="font-size: 14px; line-height: 1.6;">
+                Ce dashboard affiche vos statistiques de parrainage en temps réel. Partagez votre code partenaire pour inciter les élèves à s'inscrire.
+            </p>
+            <p style="font-size: 14px; color: #999; margin-top: 15px;">
+                Dernière mise à jour: juste maintenant
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

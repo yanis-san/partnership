@@ -1,0 +1,21 @@
+⚠️ NOUVELLE INSCRIPTION À CONFIRMER
+
+Étudiant: {{ student.full_name }}
+Email: {{ student.email }}
+Téléphone: {{ student.phone }}
+Programme: {{ student.program.name }}
+Partenaire: {{ student.library.name }}
+Code partenaire: {{ student.referral_code }}
+Date: {{ student.enrollment_date|date:"d/m/Y H:i" }}
+
+Statut: EN ATTENTE DE CONFIRMATION
+
+Commission associée: {{ partner.commission_per_student }} DA
+
+Action requise:
+Veuillez confirmer cette inscription dans le dashboard d'administration pour débloquer la commission du partenaire.
+
+{{ admin_dashboard_url }}
+
+Cordialement,
+Le système d'affiliation

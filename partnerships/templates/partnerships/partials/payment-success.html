@@ -1,0 +1,270 @@
+<!-- Conteneur pour remplacer le formulaire -->
+<div class="payment-success-container">
+    <div class="success-message">
+        <div class="success-icon">✅</div>
+        <h3>Paiement enregistré avec succès!</h3>
+        <p class="amount-displayed">{{ receipt.amount_paid|floatformat:0 }} DA</p>
+        <p class="timestamp">{{ receipt.created_at|date:"d/m/Y à H:i" }}</p>
+    </div>
+
+    <!-- Afficher le reçu uploadé -->
+    <div class="receipt-preview">
+        <h4>Aperçu du reçu</h4>
+        {% if receipt.receipt_image %}
+            <div class="receipt-image-container">
+                <img src="{{ receipt.receipt_image.url }}" alt="Reçu" class="receipt-image">
+            </div>
+        {% endif %}
+        {% if receipt.notes %}
+            <div class="receipt-notes">
+                <strong>Notes:</strong>
+                <p>{{ receipt.notes }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Infos du partenaire mises à jour -->
+    <div class="partner-updated-info">
+        <h4>Situation mise à jour</h4>
+        <div class="info-grid">
+            <div class="info-item">
+                <label>Montant Acquis</label>
+                <value>{{ partner_confirmed_amount|floatformat:0 }} DA</value>
+            </div>
+            <div class="info-item">
+                <label>Montant Payé</label>
+                <value style="color: #27ae60;">{{ partner_paid_amount|floatformat:0 }} DA</value>
+            </div>
+            <div class="info-item">
+                <label>Solde Restant</label>
+                <value style="color: #e67e22;">{{ partner_solde|floatformat:0 }} DA</value>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-buttons">
+        <button class="btn btn-primary"
+                hx-get="{% url 'payment-history' partner.id %}"
+                hx-target=".modal-content"
+                hx-swap="innerHTML">
+            Voir l'historique complet
+        </button>
+        <button class="btn btn-secondary"
+                hx-get="{% url 'payment-receipt-form' partner.id %}"
+                hx-target=".modal-content"
+                hx-swap="innerHTML">
+            Ajouter un autre paiement
+        </button>
+        <button class="btn btn-secondary"
+                onclick="document.getElementById('payment-modal').style.display = 'none';">
+            Retour au dashboard
+        </button>
+    </div>
+</div>
+
+<!-- Out-of-band swap: Mettre à jour les totaux du partenaire dans le dashboard -->
+<div id="partner-{{ partner.id }}-totals"
+     hx-swap-oob="true"
+     class="partner-header">
+    <div>
+        <h3>{{ partner.name }} ({{ partner.get_partner_type_display }})</h3>
+    </div>
+    <div class="stat-block pending">
+        <label>En Attente</label>
+        <value>{{ partner_pending_count }} × {{ partner.commission_per_student }} DA</value>
+    </div>
+    <div class="stat-block confirmed">
+        <label>Confirmés</label>
+        <value>{{ partner_confirmed_count }} × {{ partner.commission_per_student }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Montant Acquis</label>
+        <value>{{ partner_confirmed_amount|floatformat:0 }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Montant Payé</label>
+        <value style="color: #27ae60;">{{ partner_paid_amount|floatformat:0 }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Solde Restant</label>
+        <value style="color: #e67e22;">{{ partner_solde|floatformat:0 }} DA</value>
+    </div>
+</div>
+
+<style>
+    .payment-success-container {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .success-message {
+        text-align: center;
+        padding: 24px 0;
+        border-bottom: 2px solid #27ae60;
+        margin-bottom: 24px;
+    }
+
+    .success-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .success-message h3 {
+        color: #27ae60;
+        margin: 0 0 12px 0;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .amount-displayed {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 8px 0;
+    }
+
+    .timestamp {
+        color: #666;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .receipt-preview {
+        margin-bottom: 24px;
+    }
+
+    .receipt-preview h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 12px 0;
+    }
+
+    .receipt-image-container {
+        margin-bottom: 16px;
+        border-radius: 4px;
+        overflow: hidden;
+        max-height: 400px;
+    }
+
+    .receipt-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        border: 1px solid #eee;
+    }
+
+    .receipt-notes {
+        background: #f8f8f8;
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 12px;
+    }
+
+    .receipt-notes strong {
+        color: #1a1a1a;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .receipt-notes p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .partner-updated-info {
+        background: #f0f9f7;
+        padding: 16px;
+        border-radius: 4px;
+        margin-bottom: 24px;
+        border-left: 4px solid #1a9b7f;
+    }
+
+    .partner-updated-info h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 12px 0;
+        text-transform: uppercase;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+    }
+
+    .info-item {
+        background: white;
+        padding: 12px;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .info-item label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .info-item value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+        display: block;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 12px 16px;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #1a9b7f;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #158b71;
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>

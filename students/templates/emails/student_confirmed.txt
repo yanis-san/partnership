@@ -1,0 +1,17 @@
+Bonjour {{ student.full_name }},
+
+✅ Félicitations! Votre inscription a été confirmée par notre équipe administrative.
+
+Détails de votre inscription:
+- Nom: {{ student.full_name }}
+- Email: {{ student.email }}
+- Programme: {{ student.program.name }}
+- Partenaire: {{ partner.name }}
+- Date de confirmation: {% now "d/m/Y à H:i" %}
+
+Votre inscription est maintenant active et validée. Merci d'avoir choisi notre plateforme!
+
+Si vous avez des questions, n'hésitez pas à contacter le support.
+
+Cordialement,
+L'équipe Affiliation

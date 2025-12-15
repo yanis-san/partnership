@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Paiements{% endblock %}
+
+{% block content %}
+<style>
+    .payments-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 40px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 28px;
+        font-weight: 300;
+        margin-bottom: 30px;
+        color: #1a1a1a;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+
+    .summary-card .label {
+        font-size: 13px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .summary-card .value {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .summary-card.remaining {
+        border-left: 4px solid #1a9b7f;
+    }
+
+    .summary-card.remaining .value {
+        color: #1a9b7f;
+    }
+
+    /* Table des paiements */
+    .payments-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .payments-table thead {
+        background: #f5f5f5;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .payments-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 13px;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .payments-table td {
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+    }
+
+    .payments-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .payments-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .partner-name {
+        font-weight: 500;
+        color: #1a1a1a;
+    }
+
+    .amount {
+        font-family: 'Monaco', 'Menlo', monospace;
+        text-align: right;
+        font-weight: 500;
+    }
+
+    .amount.positive {
+        color: #1a9b7f;
+    }
+
+    .amount.warning {
+        color: #ff9800;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .badge.paid {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge.partial {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .badge.pending {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .footer-summary {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #e0e0e0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .footer-summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .footer-summary-item .label {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .footer-summary-item .value {
+        font-size: 18px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .footer-summary-item .value.total-remaining {
+        color: #1a9b7f;
+        font-size: 24px;
+    }
+
+    @media (max-width: 768px) {
+        .payments-table {
+            font-size: 12px;
+        }
+
+        .payments-table th,
+        .payments-table td {
+            padding: 12px;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .footer-summary {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="payments-container">
+    <div class="dashboard-header">
+        <h1>📊 Dashboard Paiements</h1>
+    </div>
+
+    <!-- Résumé total -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="label">Librairies actives</div>
+            <div class="value">{{ total_libraries }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total généré</div>
+            <div class="value">{{ grand_total_earned|floatformat:0 }} DA</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Total payé</div>
+            <div class="value">{{ grand_total_paid|floatformat:0 }} DA</div>
+        </div>
+        <div class="summary-card remaining">
+            <div class="label">Reste à payer</div>
+            <div class="value">{{ grand_total_remaining|floatformat:0 }} DA</div>
+        </div>
+    </div>
+
+    <!-- Table des paiements -->
+    <table class="payments-table">
+        <thead>
+            <tr>
+                <th style="width: 30%;">Librairie</th>
+                <th style="width: 12%; text-align: right;">Élèves</th>
+                <th style="width: 15%; text-align: right;">Total généré</th>
+                <th style="width: 15%; text-align: right;">Montant payé</th>
+                <th style="width: 15%; text-align: right;">Reste à payer</th>
+                <th style="width: 13%; text-align: center;">Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in payment_data %}
+            <tr>
+                <td>
+                    <span class="partner-name">{{ data.partner.name }}</span>
+                </td>
+                <td style="text-align: right;">
+                    {{ data.student_count }}
+                </td>
+                <td class="amount">
+                    {{ data.total_earned|floatformat:2 }} DA
+                </td>
+                <td class="amount positive">
+                    {{ data.total_paid|floatformat:2 }} DA
+                </td>
+                <td class="amount {% if data.remaining > 0 %}warning{% endif %}">
+                    <strong>{{ data.remaining|floatformat:2 }} DA</strong>
+                </td>
+                <td style="text-align: center;">
+                    {% if data.status == "Payé" %}
+                        <span class="badge paid">✓ Payé</span>
+                    {% elif data.status == "Partiel" %}
+                        <span class="badge partial">⚠ Partiel</span>
+                    {% else %}
+                        <span class="badge pending">✗ Non payé</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    <p style="color: #999;">Aucune librairie active</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Résumé final -->
+    <div class="footer-summary">
+        <div class="footer-summary-item">
+            <span class="label">Total généré :</span>
+            <span class="value">{{ grand_total_earned|floatformat:0 }} DA</span>
+        </div>
+        <div class="footer-summary-item">
+            <span class="label">Total payé :</span>
+            <span class="value">{{ grand_total_paid|floatformat:0 }} DA</span>
+        </div>
+        <div class="footer-summary-item">
+            <span class="label">Reste à payer :</span>
+            <span class="value total-remaining">{{ grand_total_remaining|floatformat:0 }} DA</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Rafraîchir la page toutes les 30 secondes pour les mises à jour en temps réel
+    setInterval(() => {
+        location.reload();
+    }, 30000);
+</script>
+
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-header {
+        margin-bottom: 30px;
+    }
+    .dashboard-header h1 {
+        font-size: 28px;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    .dashboard-header p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+        padding: 28px;
+        border-radius: 16px;
+        border-left: 5px solid #138d73;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    }
+    .stat-card.secondary {
+        border-left-color: #e74c3c;
+    }
+    .stat-card.success {
+        border-left-color: #27ae60;
+    }
+    .stat-card.info {
+        border-left-color: #3498db;
+    }
+    .stat-card h3 {
+        color: #7f8c8d;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 12px 0;
+    }
+    .stat-card .value {
+        font-size: 36px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+        line-height: 1;
+    }
+    .stat-card .subtitle {
+        color: #95a5a6;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+    .balance-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .balance-card {
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    .balance-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+    .balance-card h3 {
+        color: #7f8c8d;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 15px 0;
+    }
+    .balance-card .amount {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
+    }
+    .balance-card.positive .amount {
+        color: #27ae60;
+    }
+    .balance-card.warning .amount {
+        color: #e67e22;
+    }
+    .balance-card.danger .amount {
+        color: #e74c3c;
+    }
+    .card {
+        border-top: 5px solid #138d73 !important;
+        border-radius: 16px !important;
+    }
+    .card h2 {
+        color: #2c3e50 !important;
+        border-bottom: 2px solid #ecf0f1 !important;
+        padding-bottom: 15px !important;
+        margin-bottom: 20px !important;
+        font-size: 18px !important;
+    }
+    .data-table {
+        width: 100%;
+        font-size: 13px;
+        border-collapse: collapse;
+    }
+    .data-table thead {
+        background: #34495e;
+        color: white;
+    }
+    .data-table th {
+        padding: 14px 12px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-size: 11px;
+    }
+    .data-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .table-status {
+        text-align: center;
+    }
+    .table-amount {
+        text-align: right;
+        font-weight: 500;
+    }
+    .table-code {
+        font-family: 'Courier New', monospace;
+        background: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .table-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .count-pending {
+        color: #e67e22;
+        font-weight: 500;
+    }
+    .count-confirmed {
+        color: #27ae60;
+        font-weight: 600;
+    }
+    .amount-negative {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>Dashboard Admin</h1>
+    <p>Vue d'ensemble du système d'affiliation des partenaires</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Partenaires Actifs</h3>
+        <p class="value">{{ total_libraries }}</p>
+    </div>
+    <div class="stat-card secondary">
+        <h3>Étudiants en Attente</h3>
+        <p class="value">{{ total_students_pending }}</p>
+        <p class="subtitle">{{ total_students_confirmed }} confirmés</p>
+    </div>
+    <div class="stat-card success">
+        <h3>Montant Généré (Confirmés)</h3>
+        <p class="value">{{ total_earned_real|floatformat:0 }}</p>
+        <p class="subtitle">DA</p>
+    </div>
+    <div class="stat-card info">
+        <h3>Total Payé</h3>
+        <p class="value">{{ total_paid|floatformat:0 }}</p>
+        <p class="subtitle">DA</p>
+    </div>
+</div>
+
+<div class="balance-section">
+    <div class="balance-card {% if remaining_balance >= 0 %}positive{% else %}danger{% endif %}">
+        <h3>Solde Réel à Payer</h3>
+        <p class="amount">{{ remaining_balance|floatformat:0 }} DA</p>
+        <p class="subtitle" style="margin-top: 12px; font-size: 11px; color: #95a5a6;">Basé sur étudiants confirmés</p>
+    </div>
+    <div class="balance-card {% if remaining_balance_projected >= 0 %}warning{% else %}danger{% endif %}">
+        <h3>Solde Projeté</h3>
+        <p class="amount">{{ remaining_balance_projected|floatformat:0 }} DA</p>
+        <p class="subtitle" style="margin-top: 12px; font-size: 11px; color: #95a5a6;">Estimation des futurs confirmations</p>
+    </div>
+</div>
+
+{% if libraries %}
+<div class="card">
+    <h2>Partenaires Actifs</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Partenaire</th>
+                <th>Code</th>
+                <th>En Attente</th>
+                <th>Confirmés</th>
+                <th>Montant Généré</th>
+                <th>Montant Payé</th>
+                <th>Solde</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lib in libraries %}
+                <tr>
+                    <td class="table-name">{{ lib.name }}</td>
+                    <td><span class="table-code">{{ lib.partner_code }}</span></td>
+                    <td class="table-amount count-pending">{{ lib.total_students }}</td>
+                    <td class="table-amount count-confirmed">{{ lib.total_students_confirmed }}</td>
+                    <td class="table-amount">{{ lib.total_earned|floatformat:0 }} DA</td>
+                    <td class="table-amount">{{ lib.total_paid|floatformat:0 }} DA</td>
+                    <td class="table-amount amount-negative">{{ lib.remaining_balance|floatformat:0 }} DA</td>
+                    <td class="table-status">
+                        {% if lib.payment_status == "Paye" %}
+                            <span class="badge badge-success">PAYÉ</span>
+                        {% elif lib.payment_status == "Partiel" %}
+                            <span class="badge badge-warning">PARTIEL</span>
+                        {% else %}
+                            <span class="badge badge-danger">NON PAYÉ</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if recent_payments %}
+<div class="card">
+    <h2>Paiements Récents</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Partenaire</th>
+                <th>Montant</th>
+                <th>Référence</th>
+                <th>Statut</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in recent_payments %}
+                <tr>
+                    <td class="table-name">{{ payment.partner.name }}</td>
+                    <td class="table-amount">{{ payment.amount|floatformat:0 }} DA</td>
+                    <td><code style="color: #7f8c8d; font-size: 12px;">{{ payment.reference|default:"—" }}</code></td>
+                    <td class="table-status">
+                        {% if payment.status == 'completed' %}
+                            <span class="badge badge-success">COMPLÉTÉ</span>
+                        {% elif payment.status == 'pending' %}
+                            <span class="badge badge-warning">EN ATTENTE</span>
+                        {% else %}
+                            <span class="badge badge-danger">ANNULÉ</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: #7f8c8d; font-size: 12px;">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if recent_students %}
+<div class="card">
+    <h2>Eleves Recents</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Librairie</th>
+                <th>Niveau</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in recent_students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.partner.name|default:"—" }}</td>
+                    <td>{{ student.get_level_display }}</td>
+                    <td>{{ student.enrollment_date|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Actions Rapides</h2>
+    <a href="/admin/" class="btn">Admin Django (pour tous les details)</a>
+    <a href="{% url 'home' %}" class="btn btn-secondary" style="margin-left: 10px;">Retour a l'Accueil</a>
+</div>
+{% endblock %}

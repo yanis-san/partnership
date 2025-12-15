@@ -1,0 +1,564 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestion des Partenaires - Admin{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<style>
+    .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .admin-header {
+        margin-bottom: 40px;
+    }
+
+    .admin-header h1 {
+        font-size: 32px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 8px 0;
+    }
+
+    .admin-header p {
+        color: #666;
+        margin: 0;
+    }
+
+    .partners-list {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .partner-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .partner-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .partner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .partner-info h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+        color: #1a1a1a;
+    }
+
+    .partner-info p {
+        font-size: 13px;
+        color: #666;
+        margin: 0;
+    }
+
+    .partner-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stat {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a9b7f;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+    }
+
+    .pending-students {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+    }
+
+    .pending-students h4 {
+        margin: 0 0 12px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: #92400e;
+    }
+
+    .student-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .student-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #f0f0f0;
+    }
+
+    .student-name {
+        font-weight: 500;
+        color: #1a1a1a;
+        flex: 1;
+    }
+
+    .student-email {
+        font-size: 12px;
+        color: #666;
+        flex: 1;
+    }
+
+    .btn-confirm {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-confirm:hover {
+        background: #229954;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 16px;
+    }
+
+    .btn-action {
+        padding: 10px 16px;
+        background: #1a9b7f;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        flex: 1;
+        text-align: center;
+    }
+
+    .btn-action:hover {
+        background: #158b71;
+    }
+
+    .btn-action.secondary {
+        background: #95a5a6;
+    }
+
+    .btn-action.secondary:hover {
+        background: #7f8c8d;
+    }
+
+    .checkpoint-form {
+        display: none;
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 12px;
+    }
+
+    .checkpoint-form.show {
+        display: block;
+    }
+
+    .form-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .form-group input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+    }
+
+    .form-group textarea {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        resize: vertical;
+    }
+
+    .btn-submit {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .btn-submit:hover {
+        background: #229954;
+    }
+
+    .btn-cancel {
+        background: #95a5a6;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .message {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .warning-box {
+        background: #fee;
+        border-left: 4px solid #e74c3c;
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 16px;
+    }
+
+    .warning-box h4 {
+        margin: 0 0 8px 0;
+        color: #e74c3c;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .warning-box p {
+        margin: 0;
+        color: #c0392b;
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .partner-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .student-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Gestion des Partenaires</h1>
+        <p>Confirmez les étudiants et gérez les checkpoints de paiement</p>
+    </div>
+
+    <!-- Guide des statistiques -->
+    <div style="background: #f0f9f7; border-left: 4px solid #1a9b7f; padding: 16px; border-radius: 4px; margin-bottom: 30px;">
+        <h3 style="margin: 0 0 12px 0; color: #1a9b7f; font-size: 14px; font-weight: 600;">Guide des Statistiques</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">À confirmer</div>
+                <div style="font-size: 12px; color: #666;">Nombre d'étudiants inscrits mais non confirmés</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Depuis checkpoint</div>
+                <div style="font-size: 12px; color: #666;">Étudiants confirmés APRÈS le dernier paiement (réinitialise à 0 après chaque checkpoint)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu (depuis checkpoint)</div>
+                <div style="font-size: 12px; color: #666;">Montant à payer calculé sur les nouveaux confirmés (réinitialise après paiement)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Total confirmés</div>
+                <div style="font-size: 12px; color: #666;">Nombre TOTAL d'étudiants confirmés depuis le début</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Revenu total</div>
+                <div style="font-size: 12px; color: #666;">Montant TOTAL gagné = Total confirmés × Commission</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Total payé</div>
+                <div style="font-size: 12px; color: #666;">Somme de TOUS les checkpoints (paiements effectués)</div>
+            </div>
+            <div>
+                <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px;">Reste à payer</div>
+                <div style="font-size: 12px; color: #666;">Montant restant dû = Revenu total - Total payé (négatif = surpayé)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="partners-list">
+        {% if partners_data %}
+            {% for item in partners_data %}
+                <div class="partner-card" id="partner-{{ item.partner.id }}">
+                    <div class="partner-header">
+                        <div class="partner-info">
+                            <h3>{{ item.partner.name }}</h3>
+                            <p>{{ item.partner.get_partner_type_display }} • {{ item.partner.email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="partner-stats">
+                        <div class="stat">
+                            <div class="stat-value">{{ item.pending_count }}</div>
+                            <div class="stat-label">À confirmer</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">{{ item.confirmed_count }}</div>
+                            <div class="stat-label">Depuis checkpoint</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">{{ item.revenue_since_checkpoint|floatformat:0 }} DA</div>
+                            <div class="stat-label">Revenu (depuis checkpoint)</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">{{ item.total_confirmed_all_time }}</div>
+                            <div class="stat-label">Total confirmés</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">{{ item.total_revenue_all_time|floatformat:0 }} DA</div>
+                            <div class="stat-label">Revenu total</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">{{ item.total_paid_all_checkpoints|floatformat:0 }} DA</div>
+                            <div class="stat-label">Total payé</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" style="{% if item.remaining_payment < 0 %}color: #e74c3c;{% endif %}">
+                                {% if item.remaining_payment < 0 %}
+                                    {{ item.remaining_payment|add:0|floatformat:0 }} DA
+                                {% else %}
+                                    {{ item.remaining_payment|floatformat:0 }} DA
+                                {% endif %}
+                            </div>
+                            <div class="stat-label">Reste à payer</div>
+                        </div>
+                    </div>
+
+                    {% if item.remaining_payment < 0 %}
+                        <div class="warning-box">
+                            <h4>Attention - Surpaiement détecté</h4>
+                            <p>Vous avez payé <strong>{{ item.remaining_payment|add:0|floatformat:0 }} DA</strong> en plus du nécessaire.</p>
+                        </div>
+                    {% endif %}
+
+                    {% if item.pending_count > 0 %}
+                        <div class="pending-students">
+                            <h4>Étudiants à confirmer ({{ item.pending_count }})</h4>
+                            <ul class="student-list">
+                                {% for student in item.pending_students %}
+                                    <li class="student-item" id="student-{{ student.id }}">
+                                        <div class="student-name">{{ student.full_name }}</div>
+                                        <div class="student-email">{{ student.email }}</div>
+                                        <button class="btn-confirm" onclick="confirmStudent('{{ student.id }}', '{{ student.full_name }}')">
+                                            ✅ Confirmer
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="actions">
+                        <button class="btn-action" onclick="toggleCheckpointForm('{{ item.partner.id }}')">
+                            💳 Créer Checkpoint
+                        </button>
+                        <a href="{% url 'admin-partner-detail' item.partner.id %}" class="btn-action secondary">
+                            ⚙️ Détails
+                        </a>
+                    </div>
+
+                    <div class="checkpoint-form" id="form-{{ item.partner.id }}">
+                        <h4 style="margin: 0 0 12px 0; color: #1a1a1a;">Créer un checkpoint de paiement</h4>
+                        <div class="form-group">
+                            <input type="number" id="amount-{{ item.partner.id }}" placeholder="Montant (DA)" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="notes-{{ item.partner.id }}" placeholder="Notes (optionnel)" rows="2"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-submit" onclick="createCheckpoint('{{ item.partner.id }}')">
+                                Créer
+                            </button>
+                            <button class="btn-cancel" onclick="toggleCheckpointForm('{{ item.partner.id }}')">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px; color: #999;">
+                <p>Aucun partenaire actif pour le moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleCheckpointForm(partnerId) {
+        const form = document.getElementById(`form-${partnerId}`);
+        form.classList.toggle('show');
+    }
+
+    function confirmStudent(studentId, studentName) {
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+        fetch(`/partnerships/admin/confirm-student/${studentId}/`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const studentItem = document.getElementById(`student-${studentId}`);
+                studentItem.style.opacity = '0.5';
+                studentItem.style.textDecoration = 'line-through';
+                showMessage(`✅ ${studentName} confirmé`);
+            } else {
+                showMessage('Erreur: ' + (data.error || 'Erreur inconnue'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Erreur: ' + error.message, 'error');
+        });
+    }
+
+    function createCheckpoint(partnerId) {
+        const amount = document.getElementById(`amount-${partnerId}`).value;
+        const notes = document.getElementById(`notes-${partnerId}`).value;
+
+        if (!amount) {
+            showMessage('Veuillez entrer un montant', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('amount_paid', amount);
+        formData.append('notes', notes);
+        formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+        fetch(`/partnerships/admin/checkpoint/${partnerId}/`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById(`amount-${partnerId}`).value = '';
+                document.getElementById(`notes-${partnerId}`).value = '';
+                toggleCheckpointForm(partnerId);
+                showMessage(`✅ ${data.message}`);
+                // Recharger la page après 1 seconde
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage('Erreur: ' + (data.error || 'Erreur inconnue'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Erreur: ' + error.message, 'error');
+        });
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showMessage(text, type = 'success') {
+        const message = document.createElement('div');
+        message.className = `message ${type}`;
+        message.textContent = text;
+        document.body.insertBefore(message, document.body.firstChild);
+        setTimeout(() => message.remove(), 3000);
+    }
+</script>
+
+{% endblock %}

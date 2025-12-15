@@ -1,0 +1,23 @@
+Bonjour {{ partner.name }},
+
+Un nouvel étudiant a été inscrit via votre code de partenariat!
+
+Détails de l'inscription:
+- Étudiant: {{ student.full_name }}
+- Email: {{ student.email }}
+- Téléphone: {{ student.phone }}
+- Programme: {{ student.program.name }}
+- Code utilisé: {{ student.referral_code }}
+- Date: {{ student.enrollment_date|date:"d/m/Y H:i" }}
+
+Statut actuel: En attente de confirmation
+
+Une fois que cette inscription sera confirmée par notre équipe, vous recevrez une commission de {{ partner.commission_per_student }} DA.
+
+Vous pouvez suivre vos inscriptions et vos gains en temps réel sur votre dashboard:
+{{ login_url }}
+
+Merci de votre partenariat!
+
+Cordialement,
+L'équipe d'affiliation

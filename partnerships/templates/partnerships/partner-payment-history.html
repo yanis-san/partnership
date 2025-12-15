@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block title %}Historique des Paiements - {{ partner.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .payment-history-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .history-header {
+        background: linear-gradient(135deg, #1a9b7f 0%, #158b71 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .history-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .history-header p {
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #1a9b7f;
+    }
+
+    .summary-card h3 {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin: 0 0 10px 0;
+        font-weight: 600;
+    }
+
+    .summary-card .value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .summary-card.success .value {
+        color: #27ae60;
+    }
+
+    .summary-card.warning .value {
+        color: #e67e22;
+    }
+
+    .receipts-section {
+        margin-top: 30px;
+    }
+
+    .receipts-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 20px 0;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #1a9b7f;
+    }
+
+    .receipt-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .receipt-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .receipt-header {
+        background: #f8f8f8;
+        padding: 16px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .receipt-header-info h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .receipt-header-info p {
+        margin: 4px 0 0 0;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .receipt-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .receipt-body {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .receipt-image-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .receipt-image-section h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 12px 0;
+    }
+
+    .receipt-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+    .receipt-details-section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .receipt-details-section h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 12px 0;
+    }
+
+    .detail-item {
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .detail-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+
+    .detail-value.amount {
+        color: #27ae60;
+    }
+
+    .detail-notes {
+        background: #f8f8f8;
+        padding: 12px;
+        border-radius: 4px;
+        margin-top: 12px;
+    }
+
+    .detail-notes p {
+        margin: 0;
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .no-receipts {
+        background: white;
+        padding: 40px 20px;
+        text-align: center;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .no-receipts p {
+        color: #999;
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .action-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: #1a9b7f;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .action-button:hover {
+        background: #158b71;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .receipt-body {
+            grid-template-columns: 1fr;
+        }
+
+        .receipt-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="payment-history-container">
+    <!-- Header -->
+    <div class="history-header">
+        <h1>💳 Historique des Paiements</h1>
+        <p>{{ partner.name }} - {{ partner.get_partner_type_display }}</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <h3>Montant Acquis</h3>
+            <p class="value">{{ partner_confirmed_amount|floatformat:0 }} DA</p>
+        </div>
+        <div class="summary-card success">
+            <h3>Montant Payé</h3>
+            <p class="value">{{ partner_paid_amount|floatformat:0 }} DA</p>
+        </div>
+        <div class="summary-card warning">
+            <h3>Solde Restant</h3>
+            <p class="value">{{ partner_solde|floatformat:0 }} DA</p>
+        </div>
+        <div class="summary-card">
+            <h3>Nombre de Reçus</h3>
+            <p class="value">{{ receipts|length }}</p>
+        </div>
+    </div>
+
+    <!-- Receipts List -->
+    <div class="receipts-section">
+        <h2>Tous les Reçus</h2>
+
+        {% if receipts %}
+            {% for receipt in receipts %}
+                <div class="receipt-card">
+                    <div class="receipt-header">
+                        <div class="receipt-header-info">
+                            <h3>Reçu #{{ forloop.revcounter }}</h3>
+                            <p>{{ receipt.created_at|date:"d/m/Y à H:i" }}</p>
+                        </div>
+                        <span class="receipt-status">✅ {{ receipt.payment.get_status_display }}</span>
+                    </div>
+
+                    <div class="receipt-body">
+                        <!-- Image du reçu -->
+                        <div class="receipt-image-section">
+                            <h4>Photo du Reçu</h4>
+                            {% if receipt.receipt_image and receipt.receipt_image.url %}
+                                <img src="{{ receipt.receipt_image.url }}" alt="Reçu" class="receipt-image" style="cursor: pointer;" onclick="openImageLightbox('{{ receipt.receipt_image.url }}', 'Reçu #{{ forloop.revcounter }}')">
+                            {% else %}
+                                <div class="receipt-image" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; flex-direction: column;">
+                                    📷 Pas d'image
+                                    <span style="font-size: 12px; margin-top: 8px;">
+                                        {% if receipt.receipt_image %}
+                                            (Chemin: {{ receipt.receipt_image }})
+                                        {% else %}
+                                            (Aucune image fournie)
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Détails du paiement -->
+                        <div class="receipt-details-section">
+                            <h4>Détails du Paiement</h4>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Montant Payé</div>
+                                <div class="detail-value amount">{{ receipt.amount_paid|floatformat:0 }} DA</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Date de Paiement</div>
+                                <div class="detail-value">{{ receipt.payment.completed_at|date:"d/m/Y à H:i" }}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Statut</div>
+                                <div class="detail-value">{{ receipt.payment.get_status_display }}</div>
+                            </div>
+
+                            {% if receipt.notes %}
+                                <div class="detail-notes">
+                                    <strong>Notes:</strong>
+                                    <p>{{ receipt.notes }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-receipts">
+                <p>Aucun reçu de paiement enregistré pour ce partenaire</p>
+                <a href="{% url 'payment-receipt-form' partner.id %}" class="action-button">
+                    Ajouter un Paiement
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Back Button -->
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{% url 'admin-confirmations' %}" class="action-button">
+            ← Retour au Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Lightbox pour voir les reçus en grand -->
+<div id="lightbox" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.9); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="position: relative; max-width: 90vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+        <button onclick="closeLightbox()" style="position: absolute; top: 20px; right: 20px; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 2001;">×</button>
+        <img id="lightbox-image" src="" alt="" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 4px;">
+        <p id="lightbox-title" style="color: white; margin-top: 16px; font-size: 16px;"></p>
+    </div>
+</div>
+
+<script>
+    function openImageLightbox(imageUrl, title) {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxTitle = document.getElementById('lightbox-title');
+
+        lightboxImage.src = imageUrl;
+        lightboxTitle.textContent = title;
+        lightbox.style.display = 'flex';
+    }
+
+    function closeLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        lightbox.style.display = 'none';
+    }
+
+    // Fermer la lightbox quand on clique sur le fond
+    document.getElementById('lightbox')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLightbox();
+        }
+    });
+
+    // Fermer avec la touche Échap
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeLightbox();
+        }
+    });
+</script>
+
+{% endblock %}

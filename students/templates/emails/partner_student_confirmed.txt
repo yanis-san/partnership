@@ -1,0 +1,21 @@
+Bonjour {{ partner.name }},
+
+✅ Une nouvelle inscription a été confirmée par notre équipe administrative!
+
+Commission acquise:
+- Étudiant: {{ student.full_name }}
+- Email: {{ student.email }}
+- Téléphone: {{ student.phone }}
+- Programme: {{ student.program.name }}
+- Date de confirmation: {% now "d/m/Y à H:i" %}
+- Commission: {{ commission }} DA
+
+Montant dû mis à jour dans votre tableau de bord personnel.
+
+Connectez-vous à votre compte pour voir vos montants actualisés:
+https://yourdomain.com/partnerships/dashboard/
+
+Merci de votre collaboration!
+
+Cordialement,
+L'équipe Affiliation

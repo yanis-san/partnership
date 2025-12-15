@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}QR Codes - Codes Partenaires{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>QR Codes des Librairies</h2>
+    <p>Telechargez et imprimez les QR codes pour vos clients!</p>
+    <p style="color: #666; font-size: 12px;">Les images sont sauvegardees dans: /static/qrcodes/</p>
+</div>
+
+{% if codes %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+        {% for code_info in codes %}
+        <div class="card" style="text-align: center;">
+            <h3 style="color: #2c3e50;">{{ code_info.partner.name }}</h3>
+            <p style="color: #666; margin: 10px 0;">Code: <strong style="font-size: 16px;">{{ code_info.code }}</strong></p>
+
+            <!-- Afficher le QR code -->
+            <div style="margin: 20px 0; padding: 20px; background: white; border-radius: 8px; display: inline-block; border: 3px solid #ddd;">
+                <img src="{{ code_info.qr_base64 }}" alt="QR Code pour {{ code_info.code }}" style="width: 250px; height: 250px; display: block;">
+            </div>
+
+            <p style="margin: 15px 0; font-size: 12px; color: #999;">
+                Code: <strong>{{ code_info.code }}</strong>
+            </p>
+
+            <hr style="margin: 15px 0;">
+
+            <p style="margin: 10px 0;"><strong>Commission:</strong> {{ code_info.partner.commission_per_student }} DA/eleve</p>
+            <p style="margin: 10px 0;"><strong>Eleves inscrits:</strong> {{ code_info.partner.total_students }}</p>
+            <p style="margin: 10px 0;"><strong>Montant genere:</strong> {{ code_info.partner.total_earned|floatformat:0 }} DA</p>
+
+            <div style="margin-top: 15px;">
+                <a href="{{ code_info.qr_base64 }}" download="{{ code_info.qr_file }}" class="btn" style="display: inline-block; margin-right: 5px;">Telecharger</a>
+                <a href="{{ code_info.register_url }}" class="btn btn-secondary" style="display: inline-block;">Tester</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="card" style="text-align: center;">
+    <p>Aucun code disponible pour le moment.</p>
+    <p style="color: #999; font-size: 12px;">Les codes seront generes une fois que vous ajoutez des librairies.</p>
+</div>
+{% endif %}
+
+<div class="card" style="margin-top: 30px;">
+    <h3>Comment utiliser les QR codes?</h3>
+    <ol style="margin-left: 20px; line-height: 1.8;">
+        <li><strong>Telecharger</strong> l'image PNG du QR code</li>
+        <li><strong>Imprimer</strong> en grand (minimum 10cm x 10cm)</li>
+        <li><strong>Plastifier</strong> si possible (durabilite)</li>
+        <li><strong>Afficher</strong> dans la librairie (comptoir, vitrines, etc.)</li>
+        <li><strong>Les clients scannent</strong> avec leur telephone</li>
+        <li><strong>S'inscrivent directement</strong> - code pré-rempli!</li>
+    </ol>
+</div>
+
+{% endblock %}

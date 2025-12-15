@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques - Partenaires{% endblock %}
+
+{% block content %}
+<style>
+    .stats-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .stats-header {
+        margin-bottom: 30px;
+    }
+
+    .stats-header h1 {
+        font-size: 28px;
+        margin: 0 0 8px 0;
+        color: #1a1a1a;
+    }
+
+    .stats-header p {
+        color: #666;
+        margin: 0;
+    }
+
+    .summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #1a9b7f;
+    }
+
+    .summary-card h3 {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin: 0 0 8px 0;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .summary-card .value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a9b7f;
+        margin: 0;
+    }
+
+    .partners-table {
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px;
+        border-bottom: 1px solid #e8e8e8;
+    }
+
+    .table-header h2 {
+        margin: 0;
+        font-size: 18px;
+        color: #1a1a1a;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: #f8f8f8;
+        border-bottom: 2px solid #e8e8e8;
+    }
+
+    th {
+        padding: 12px 20px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    td {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+    }
+
+    tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .partner-name {
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .partner-type {
+        font-size: 11px;
+        background: #f0f9f7;
+        color: #1a9b7f;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .code-cell {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #1a9b7f;
+    }
+
+    .stat-number {
+        font-weight: 600;
+        color: #1a1a1a;
+        text-align: center;
+    }
+
+    .earned-amount {
+        font-weight: 600;
+        color: #27ae60;
+    }
+
+    .codes-subtable {
+        display: none;
+        background: #fafafa;
+    }
+
+    .codes-subtable.visible {
+        display: table-row-group;
+    }
+
+    .code-row {
+        background: #fafafa;
+    }
+
+    .code-row td {
+        padding-left: 40px;
+        font-size: 13px;
+    }
+
+    .code-row .code-cell {
+        font-size: 12px;
+    }
+
+    .toggle-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: #1a9b7f;
+        font-weight: 600;
+        padding: 0;
+    }
+
+    .toggle-btn:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .summary-cards {
+            grid-template-columns: 1fr;
+        }
+
+        table {
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+        }
+
+        .code-row td {
+            padding-left: 24px;
+        }
+    }
+</style>
+
+<div class="stats-container">
+    <!-- Header -->
+    <div class="stats-header">
+        <h1>📊 Statistiques Partenaires</h1>
+        <p>Suivi des inscriptions par code et par partenaire</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <h3>Total Partenaires</h3>
+            <p class="value">{{ total_partners }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>En Attente</h3>
+            <p class="value" style="color: #e67e22;">{{ total_pending }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>Confirmés</h3>
+            <p class="value" style="color: #27ae60;">{{ total_confirmed }}</p>
+        </div>
+        <div class="summary-card">
+            <h3>Montant Acquis</h3>
+            <p class="value" style="color: #27ae60;">{{ total_earned|floatformat:0 }} DA</p>
+        </div>
+    </div>
+
+    <!-- Partners Table -->
+    {% if partners_data %}
+        <div class="partners-table">
+            <div class="table-header">
+                <h2>Partenaires & Codes</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Partenaire</th>
+                        <th style="width: 15%;">Codes</th>
+                        <th style="text-align: center;">En Attente</th>
+                        <th style="text-align: center;">Confirmés</th>
+                        <th style="text-align: right;">Montant Acquis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in partners_data %}
+                        <tr>
+                            <td>
+                                <div class="partner-name">{{ item.partner.name }}</div>
+                                <div class="partner-type">{{ item.type }}</div>
+                            </td>
+                            <td>
+                                <button class="toggle-btn" onclick="toggleCodes(this)">
+                                    {{ item.codes|length }} code(s) ▼
+                                </button>
+                            </td>
+                            <td class="stat-number" style="color: #e67e22;">{{ item.total_pending }}</td>
+                            <td class="stat-number" style="color: #27ae60;">{{ item.total_confirmed }}</td>
+                            <td class="earned-amount" style="text-align: right;">{{ item.total_earned|floatformat:0 }} DA</td>
+                        </tr>
+
+                        <!-- Codes Details (Hidden by default) -->
+                        <tr class="code-row" style="display: none;">
+                            <td colspan="5">
+                                <table style="width: 100%; background: transparent; box-shadow: none; margin: 0;">
+                                    {% for code in item.codes %}
+                                        <tr style="background: white; border-bottom: 1px solid #e8e8e8;">
+                                            <td style="padding-left: 60px; width: 30%;">
+                                                <span class="code-cell">{{ code.code }}</span>
+                                            </td>
+                                            <td style="text-align: center; width: 20%;"></td>
+                                            <td style="text-align: center; width: 20%; color: #e67e22;">{{ code.pending }}</td>
+                                            <td style="text-align: center; width: 20%; color: #27ae60;">{{ code.confirmed }}</td>
+                                            <td style="text-align: right; width: 30%; padding-right: 20px;">
+                                                <span class="earned-amount">{{ code.earned|floatformat:0 }} DA</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="background: white; padding: 40px; text-align: center; border-radius: 6px;">
+            <p style="color: #999;">Aucun partenaire trouvé</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleCodes(btn) {
+        const row = btn.closest('tr');
+        const nextRow = row.nextElementSibling;
+
+        if (nextRow && nextRow.classList.contains('code-row')) {
+            const isVisible = nextRow.style.display !== 'none';
+            nextRow.style.display = isVisible ? 'none' : 'table-row';
+            btn.textContent = btn.textContent.replace(/▼|▶/, isVisible ? '▶' : '▼');
+        }
+    }
+</script>
+
+{% endblock %}

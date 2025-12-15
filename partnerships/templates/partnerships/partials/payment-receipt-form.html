@@ -1,0 +1,203 @@
+<div class="payment-receipt-form-wrapper">
+    <div class="form-header">
+        <h4>Ajouter un paiement pour {{ partner.name }}</h4>
+        <p class="text-muted">Saisissez le montant et uploadez la photo du reçu</p>
+    </div>
+
+    {% if errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for field, error_list in errors.items %}
+                <strong>{{ field }}:</strong>
+                {% for error in error_list %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form class="payment-form" id="payment-form" method="POST" enctype="multipart/form-data" action="{% url 'payment-receipt-upload' partner.id %}">
+        {% csrf_token %}
+
+        <div class="form-group mb-3">
+            <label for="amount_paid" class="form-label">{{ form.amount_paid.label }}</label>
+            <div class="input-group">
+                {{ form.amount_paid }}
+                <span class="input-group-text">DA</span>
+            </div>
+            {% if form.amount_paid.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.amount_paid.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="receipt_image" class="form-label">{{ form.receipt_image.label }}</label>
+            <div class="image-upload-wrapper">
+                {{ form.receipt_image }}
+                <small class="form-text text-muted d-block mt-2">
+                    📸 Vous pouvez prendre une photo directement avec votre appareil photo
+                </small>
+            </div>
+            {% if form.receipt_image.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.receipt_image.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="notes" class="form-label">{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.notes.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg" id="submit-payment">
+                Valider le paiement
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="closePaymentModal();">
+                Annuler
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .payment-receipt-form-wrapper {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 24px;
+        border-bottom: 2px solid #1a9b7f;
+        padding-bottom: 16px;
+    }
+
+    .form-header h4 {
+        margin: 0 0 8px 0;
+        color: #1a1a1a;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .form-header p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .payment-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .payment-form .form-label {
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .payment-form .form-control,
+    .payment-form .form-control-lg {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .payment-form .form-control-lg {
+        font-size: 18px;
+        padding: 12px 16px;
+        font-weight: 600;
+    }
+
+    .payment-form .form-control:focus {
+        border-color: #1a9b7f;
+        box-shadow: 0 0 0 0.2rem rgba(26, 155, 127, 0.25);
+    }
+
+    .input-group-text {
+        background: #f8f8f8;
+        border: 1px solid #ddd;
+        color: #666;
+        font-weight: 600;
+    }
+
+    .image-upload-wrapper {
+        position: relative;
+    }
+
+    .image-upload-wrapper input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 20px;
+        border: 2px dashed #1a9b7f;
+        border-radius: 4px;
+        background: #f0f9f7;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-wrapper input[type="file"]:hover {
+        background: #e8f5f2;
+        border-color: #158b71;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .form-actions button {
+        flex: 1;
+        padding: 12px 16px;
+        font-weight: 600;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #1a9b7f;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #158b71;
+    }
+
+    .btn-secondary {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    .htmx-request .htmx-indicator {
+        display: inline-block !important;
+    }
+
+    .htmx-indicator {
+        display: none;
+    }
+</style>
+

@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription Réussie{% endblock %}
+
+{% block content %}
+<style>
+    .success-header {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #1a9b7f 0%, #158b71 100%);
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 40px;
+    }
+
+    .success-header h1 {
+        font-size: 32px;
+        font-weight: 300;
+        margin: 0 0 10px 0;
+        letter-spacing: -0.5px;
+    }
+
+    .success-header p {
+        font-size: 16px;
+        margin: 0;
+        opacity: 0.95;
+    }
+
+    .success-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .profile-card {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 30px;
+    }
+
+    .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .profile-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .profile-label {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #999;
+        margin-bottom: 6px;
+        letter-spacing: 0.3px;
+    }
+
+    .profile-value {
+        font-size: 16px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+
+    .profile-value.highlight {
+        color: #1a9b7f;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .code-box {
+        background: #f5f5f5;
+        border: 2px solid #e8e8e8;
+        padding: 12px 16px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        color: #1a1a1a;
+        font-weight: 600;
+        margin-top: 4px;
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .info-card {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .info-card h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        color: #1a1a1a;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #1a9b7f;
+    }
+
+    .info-card ol {
+        margin: 0;
+        padding-left: 20px;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    .info-card li {
+        margin-bottom: 8px;
+    }
+
+    .partner-highlight {
+        background: #f0f9f7;
+        padding: 16px;
+        border-left: 4px solid #1a9b7f;
+        border-radius: 4px;
+        margin-top: 12px;
+    }
+
+    .partner-highlight p {
+        margin: 0 0 8px 0;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .partner-name {
+        font-size: 18px;
+        color: #1a9b7f;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: 14px 24px;
+        border-radius: 4px;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #1a9b7f;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #158b71;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(26, 155, 127, 0.25);
+    }
+
+    .btn-secondary {
+        background: #f5f5f5;
+        color: #1a1a1a;
+        border: 1.5px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+        background: #f0f0f0;
+        border-color: #1a1a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (max-width: 768px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .two-column {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+        }
+
+        .success-header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<!-- Header Success -->
+<div class="success-header">
+    <div class="success-icon">✅</div>
+    <h1>Inscription Réussie!</h1>
+    <p>Bienvenue dans notre école. Votre inscription a été confirmée avec succès.</p>
+</div>
+
+{% if student %}
+<!-- Profil Card -->
+<div class="profile-card">
+    <h2 style="font-size: 18px; font-weight: 600; margin: 0 0 24px 0; color: #1a1a1a;">Votre Profil</h2>
+
+    <div class="profile-grid">
+        <div class="profile-item">
+            <div class="profile-label">Nom complet</div>
+            <div class="profile-value">{{ student.full_name }}</div>
+        </div>
+
+        <div class="profile-item">
+            <div class="profile-label">Email</div>
+            <div class="profile-value">{{ student.email }}</div>
+        </div>
+
+        <div class="profile-item">
+            <div class="profile-label">Téléphone</div>
+            <div class="profile-value">{{ student.phone|default:"Non fourni" }}</div>
+        </div>
+
+        <div class="profile-item">
+            <div class="profile-label">Programme</div>
+            <div class="profile-value">{{ student.program.name }}</div>
+        </div>
+
+        <div class="profile-item">
+            <div class="profile-label">Partenaire</div>
+            <div class="profile-value highlight">
+                {% if student.partner %}
+                    {{ student.partner.name }}
+                {% else %}
+                    Non associé
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="profile-item">
+            <div class="profile-label">Date d'inscription</div>
+            <div class="profile-value">{{ student.enrollment_date|date:"d/m/Y" }}</div>
+        </div>
+    </div>
+
+    <div class="profile-item">
+        <div class="profile-label">Code utilisé</div>
+        <div class="code-box">{{ student.referral_code }}</div>
+    </div>
+</div>
+
+<!-- Two Column Section -->
+<div class="two-column">
+    <!-- Prochaines Étapes -->
+    <div class="info-card">
+        <h3>Prochaines Étapes</h3>
+        <ol>
+            <li>Vérifiez votre email de confirmation</li>
+            <li>Consultez les détails de votre programme</li>
+            <li>Préparez vos documents si nécessaire</li>
+            <li>Contactez-nous si vous avez des questions</li>
+        </ol>
+    </div>
+
+    <!-- Remerciements -->
+    <div class="info-card">
+        <h3>Remerciements</h3>
+        <p>Merci pour votre inscription! Vous avez été dirigé par:</p>
+
+        <div class="partner-highlight">
+            <p class="partner-name">{{ student.partner.name }}</p>
+            <p>Ce partenaire reçoit une commission pour chaque inscription réussie. Nous les remercions de leur soutien!</p>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <a href="{% url 'home' %}" class="btn-action btn-primary">Retour à l'Accueil</a>
+</div>
+
+{% endif %}
+
+{% endblock %}

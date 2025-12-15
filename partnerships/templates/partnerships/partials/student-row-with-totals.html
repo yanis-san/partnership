@@ -1,0 +1,58 @@
+<!-- Updated student row (replaces the old one) -->
+<tr id="student-{{ student.id }}"
+    hx-target="this"
+    hx-swap="outerHTML">
+    <td class="student-name">{{ student.full_name }}</td>
+    <td>{{ student.email }}</td>
+    <td>{{ student.program.name }}</td>
+    <td>{{ student.enrollment_date|date:"d/m/Y" }}</td>
+    <td>
+        {% if student.is_confirmed %}
+            <span class="status-badge status-confirmed">✅ Confirmé</span>
+        {% else %}
+            <span class="status-badge status-pending">⏳ En Attente</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if not student.is_confirmed %}
+            <button class="btn-confirm"
+                hx-post="{% url 'confirm-student-htmx' student.id %}"
+                hx-indicator="#indicator-{{ student.id }}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                <span id="indicator-{{ student.id }}" class="htmx-indicator">...</span>
+                Confirmer
+            </button>
+        {% else %}
+            <span style="color: #999; font-size: 12px;">Confirmé</span>
+        {% endif %}
+    </td>
+</tr>
+
+<!-- Out-of-band swap: Update partner totals section -->
+<div id="partner-{{ partner.id }}-totals"
+     hx-swap-oob="true"
+     class="partner-header">
+    <div>
+        <h3>{{ partner.name }} ({{ partner.get_partner_type_display }})</h3>
+    </div>
+    <div class="stat-block pending">
+        <label>En Attente</label>
+        <value>{{ partner_pending_count }} × {{ partner.commission_per_student }} DA</value>
+    </div>
+    <div class="stat-block confirmed">
+        <label>Confirmés</label>
+        <value>{{ partner_confirmed_count }} × {{ partner.commission_per_student }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Montant Acquis</label>
+        <value>{{ partner_confirmed_amount|floatformat:0 }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Montant Payé</label>
+        <value>{{ partner_paid_amount|floatformat:0 }} DA</value>
+    </div>
+    <div class="stat-block">
+        <label>Solde Restant</label>
+        <value style="color: #e67e22;">{{ partner_solde|floatformat:0 }} DA</value>
+    </div>
+</div>

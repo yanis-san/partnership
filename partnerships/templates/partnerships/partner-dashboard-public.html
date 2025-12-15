@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ partner.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Dashboard - {{ partner.name }}</h2>
+    <p>Code partenaire: <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 3px;">{{ partner.partner_code }}</code></p>
+    <p>Email: {{ partner.email }}</p>
+</div>
+
+<div class="grid">
+    <div class="stat-box">
+        <h3>Eleves Parraines</h3>
+        <div class="value">{{ total_students }}</div>
+    </div>
+    <div class="stat-box">
+        <h3>Commission par Eleve</h3>
+        <div class="value">{{ partner.commission_per_student }} DA</div>
+    </div>
+    <div class="stat-box">
+        <h3>Montant Genere</h3>
+        <div class="value">{{ total_earned|floatformat:0 }} DA</div>
+    </div>
+    <div class="stat-box">
+        <h3>Montant Paye</h3>
+        <div class="value">{{ total_paid|floatformat:0 }} DA</div>
+    </div>
+    <div class="stat-box">
+        <h3>Solde a Recevoir</h3>
+        <div class="value">{{ remaining_balance|floatformat:0 }} DA</div>
+    </div>
+    <div class="stat-box">
+        <h3>Statut de Paiement</h3>
+        <div class="value" style="font-size: 18px;">
+            {% if payment_status == "Paye" %}
+                <span class="badge badge-success">PAYE</span>
+            {% elif payment_status == "Partiel" %}
+                <span class="badge badge-warning">PARTIEL</span>
+            {% else %}
+                <span class="badge badge-danger">EN ATTENTE</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if students %}
+<div class="card">
+    <h2>Eleves Inscrits</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Niveau</th>
+                <th>Date d'Inscription</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+                <tr>
+                    <td>{{ student.full_name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>{{ student.get_level_display }}</td>
+                    <td>{{ student.enrollment_date|date:"d/m/Y" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p style="text-align: center; color: #999;">Aucun eleve inscrit pour le moment.</p>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Informations Supplementaires</h2>
+    <p><strong>Nom:</strong> {{ partner.name }}</p>
+    <p><strong>Email:</strong> {{ partner.email }}</p>
+    <p><strong>Telephone:</strong> {{ partner.phone }}</p>
+    <p><strong>Personne de contact:</strong> {{ partner.contact_person }}</p>
+    <p><strong>Adresse:</strong> {{ partner.address }}</p>
+
+    <h3 style="margin-top: 20px;">Vos Codes Partenaires</h3>
+    {% if partnership_codes %}
+        <p>Codes actifs:</p>
+        <ul style="margin-left: 20px;">
+            {% for code in partnership_codes %}
+                <li><code style="background: #f5f5f5; padding: 5px 10px; border-radius: 3px;">{{ code.code }}</code></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun code actif</p>
+    {% endif %}
+</div>
+{% endblock %}
