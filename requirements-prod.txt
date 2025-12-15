@@ -23,7 +23,7 @@ whitenoise==6.6.0                # Serveur fichiers statiques efficace
 
 # ===== SECURITY =====
 # Django inclut CSRF, XSS protection
-cryptography==41.0.7             # Pour chiffrement optionnel PII
+cryptography==44.0.1             # Pour chiffrement optionnel PII
 
 # ===== MONITORING & LOGGING =====
 # sentry-sdk==1.38.0              # Crash reporting (optionnel)
