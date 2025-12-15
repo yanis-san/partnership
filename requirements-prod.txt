@@ -29,7 +29,7 @@ cryptography==41.0.7             # Pour chiffrement optionnel PII
 # sentry-sdk==1.38.0              # Crash reporting (optionnel)
 
 # ===== UTILITIES =====
-requests==2.31.0                 # HTTP client
+requests==2.32.4                 # HTTP client
 pytz==2023.3.post1              # Timezone support
 
 # ===== DEVELOPMENT (ne pas installer en prod) =====
