@@ -9,7 +9,7 @@ psycopg2-binary==2.9.9          # PostgreSQL adapter pour Django
 # mysqlclient==2.2.0
 
 # ===== IMAGE PROCESSING =====
-Pillow==10.1.0                   # Pour traitement images (PaymentReceipt.receipt_image)
+Pillow==10.3.0                   # Pour traitement images (PaymentReceipt.receipt_image)
 qrcode[pil]==7.4.2              # Pour génération QR codes
 
 # ===== WEB SERVER =====
