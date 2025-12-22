@@ -13,7 +13,7 @@ Pillow==10.1.0                   # Pour traitement images (PaymentReceipt.receip
 qrcode[pil]==7.4.2              # Pour génération QR codes
 
 # ===== WEB SERVER =====
-gunicorn==21.2.0                 # WSGI HTTP Server (pour production)
+gunicorn==22.0.0                 # WSGI HTTP Server (pour production)
 whitenoise==6.6.0                # Serveur fichiers statiques efficace
 
 # ===== EMAIL =====
