@@ -1,433 +1,508 @@
-{% extends "base.html" %}
-
-{% block title %}Accueil - Plateforme d'Affiliation IRL{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Accueil - Plateforme d'Affiliation
+IRL{% endblock %} {% block content %}
 <style>
-    .hero-section {
-        background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
-        color: white;
-        padding: 60px 20px;
-        border-radius: 16px;
-        margin-bottom: 40px;
-        text-align: center;
-        box-shadow: 0 4px 24px rgba(19, 141, 115, 0.2);
-    }
+  .hero-section {
+    background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
+    color: white;
+    padding: 60px 20px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(19, 141, 115, 0.2);
+  }
 
+  .hero-section h1 {
+    font-size: 42px;
+    font-weight: 300;
+    margin: 0 0 12px 0;
+    letter-spacing: -1px;
+  }
+
+  .hero-section p {
+    font-size: 18px;
+    opacity: 0.95;
+    margin: 0 0 30px 0;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-hero {
+    padding: 14px 32px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .btn-hero.primary {
+    background: white;
+    color: #138d73;
+  }
+
+  .btn-hero.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-hero.secondary {
+    border: 2px solid white;
+    color: white;
+    background: transparent;
+  }
+
+  .btn-hero.secondary:hover {
+    background: white;
+    color: #138d73;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .feature-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid #138d73;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(19, 141, 115, 0.15);
+  }
+
+  .feature-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: #1a1a1a;
+  }
+
+  .feature-card p {
+    color: #666;
+    margin: 0 0 16px 0;
+    line-height: 1.6;
+  }
+
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+
+  .feature-list li {
+    padding: 8px 0;
+    color: #666;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .feature-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #138d73;
+    font-weight: bold;
+  }
+
+  .how-it-works {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 40px;
+  }
+
+  .how-it-works h2 {
+    text-align: center;
+    margin-bottom: 32px;
+    color: #1a1a1a;
+  }
+
+  .steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .step {
+    text-align: center;
+    position: relative;
+    padding: 20px;
+  }
+
+  .step:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: #138d73;
+    font-weight: bold;
+  }
+
+  .step-number {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 auto 12px;
+    box-shadow: 0 4px 12px rgba(19, 141, 115, 0.3);
+  }
+
+  .step h4 {
+    margin: 12px 0 8px 0;
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .step p {
+    color: #666;
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 32px;
+    color: #1a1a1a;
+  }
+
+  .section-title h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+
+  .section-title p {
+    color: #666;
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .cta-section {
+    background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    margin-top: 40px;
+    box-shadow: 0 4px 24px rgba(19, 141, 115, 0.2);
+  }
+
+  .cta-section h2 {
+    font-size: 28px;
+    margin: 0 0 12px 0;
+  }
+
+  .cta-section p {
+    font-size: 16px;
+    margin: 0 0 24px 0;
+    opacity: 0.95;
+  }
+
+  @media (max-width: 768px) {
     .hero-section h1 {
-        font-size: 42px;
-        font-weight: 300;
-        margin: 0 0 12px 0;
-        letter-spacing: -1px;
-    }
-
-    .hero-section p {
-        font-size: 18px;
-        opacity: 0.95;
-        margin: 0 0 30px 0;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
+      font-size: 32px;
     }
 
     .hero-buttons {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        flex-wrap: wrap;
+      flex-direction: column;
     }
 
     .btn-hero {
-        padding: 14px 32px;
-        border-radius: 4px;
-        border: none;
-        font-size: 14px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-    }
-
-    .btn-hero.primary {
-        background: white;
-        color: #138d73;
-    }
-
-    .btn-hero.primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-hero.secondary {
-        border: 2px solid white;
-        color: white;
-        background: transparent;
-    }
-
-    .btn-hero.secondary:hover {
-        background: white;
-        color: #138d73;
+      width: 100%;
     }
 
     .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-
-    .feature-card {
-        background: white;
-        padding: 32px;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border-top: 4px solid #138d73;
-        transition: all 0.3s ease;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(19, 141, 115, 0.15);
-    }
-
-    .feature-icon {
-        font-size: 32px;
-        margin-bottom: 12px;
-    }
-
-    .feature-card h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin: 0 0 12px 0;
-        color: #1a1a1a;
-    }
-
-    .feature-card p {
-        color: #666;
-        margin: 0 0 16px 0;
-        line-height: 1.6;
-    }
-
-    .feature-list {
-        list-style: none;
-        padding: 0;
-        margin: 16px 0;
-    }
-
-    .feature-list li {
-        padding: 8px 0;
-        color: #666;
-        padding-left: 24px;
-        position: relative;
-    }
-
-    .feature-list li:before {
-        content: '✓';
-        position: absolute;
-        left: 0;
-        color: #138d73;
-        font-weight: bold;
-    }
-
-    .how-it-works {
-        background: white;
-        padding: 40px;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        margin-bottom: 40px;
-    }
-
-    .how-it-works h2 {
-        text-align: center;
-        margin-bottom: 32px;
-        color: #1a1a1a;
-    }
-
-    .steps-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-    }
-
-    .step {
-        text-align: center;
-        position: relative;
-        padding: 20px;
+      grid-template-columns: 1fr;
     }
 
     .step:not(:last-child)::after {
-        content: '→';
-        position: absolute;
-        right: -12px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 24px;
-        color: #138d73;
-        font-weight: bold;
+      display: none;
     }
 
-    .step-number {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        font-weight: 700;
-        margin: 0 auto 12px;
-        box-shadow: 0 4px 12px rgba(19, 141, 115, 0.3);
+    .steps-container {
+      grid-template-columns: 1fr;
     }
 
-    .step h4 {
-        margin: 12px 0 8px 0;
-        color: #1a1a1a;
-        font-size: 14px;
-        font-weight: 600;
+    .how-it-works {
+      padding: 20px;
     }
-
-    .step p {
-        color: #666;
-        font-size: 13px;
-        margin: 0;
-    }
-
-    .section-title {
-        text-align: center;
-        margin-bottom: 32px;
-        color: #1a1a1a;
-    }
-
-    .section-title h2 {
-        font-size: 28px;
-        font-weight: 600;
-        margin: 0 0 8px 0;
-    }
-
-    .section-title p {
-        color: #666;
-        font-size: 16px;
-        margin: 0;
-    }
-
-    .cta-section {
-        background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
-        color: white;
-        padding: 40px;
-        border-radius: 16px;
-        text-align: center;
-        margin-top: 40px;
-        box-shadow: 0 4px 24px rgba(19, 141, 115, 0.2);
-    }
-
-    .cta-section h2 {
-        font-size: 28px;
-        margin: 0 0 12px 0;
-    }
-
-    .cta-section p {
-        font-size: 16px;
-        margin: 0 0 24px 0;
-        opacity: 0.95;
-    }
-
-    @media (max-width: 768px) {
-        .hero-section h1 {
-            font-size: 32px;
-        }
-
-        .hero-buttons {
-            flex-direction: column;
-        }
-
-        .btn-hero {
-            width: 100%;
-        }
-
-        .features-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .step:not(:last-child)::after {
-            display: none;
-        }
-
-        .steps-container {
-            grid-template-columns: 1fr;
-        }
-
-        .how-it-works {
-            padding: 20px;
-        }
-    }
+  }
 </style>
 
 <!-- Hero Section -->
 <div class="hero-section">
-    <h1>La Trinité de l'Affiliation IRL</h1>
-    <p>Connectez les trois piliers de l'économie étudiante : étudiants, écoles et partenaires commerciaux</p>
-    <div class="hero-buttons">
-        <a href="{% url 'student-register' %}" class="btn-hero primary">Inscription Étudiant</a>
-        <a href="{% url 'partnership-request' %}" class="btn-hero secondary">Devenir Partenaire</a>
-    </div>
+  <h1>La Trinité de l'Affiliation IRL</h1>
+  <p>
+    Connectez les trois piliers de l'économie étudiante : étudiants, écoles et
+    partenaires commerciaux
+  </p>
+  <div class="hero-buttons">
+    <a href="{% url 'student-register' %}" class="btn-hero primary"
+      >Inscription Étudiant</a
+    >
+    <a href="{% url 'partnership-request' %}" class="btn-hero secondary"
+      >Devenir Partenaire</a
+    >
+  </div>
 </div>
 
 <!-- The Trinity Section -->
-<div class="how-it-works" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-top: 4px solid #138d73;">
-    <div class="section-title">
-        <h2>Les Trois Piliers de la Plateforme</h2>
-        <p>Une économie collaborative où chacun gagne</p>
+<div
+  class="how-it-works"
+  style="
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-top: 4px solid #138d73;
+  "
+>
+  <div class="section-title">
+    <h2>Les Trois Piliers de la Plateforme</h2>
+    <p>Une économie collaborative où chacun gagne</p>
+  </div>
+  <div class="features-grid">
+    <!-- Students -->
+    <div
+      class="feature-card"
+      style="border-left: 4px solid #138d73; border-top: none"
+    >
+      <h3>Les Étudiants</h3>
+      <p><strong>Accédez à des offres exclusives</strong></p>
+      <ul class="feature-list">
+        <li>Inscription simple et rapide (2 min)</li>
+        <li>Scanner un QR code ou saisir un code</li>
+        <li>Confirmation instantanée</li>
+        <li>Accès à des services partenaires</li>
+      </ul>
+      <a
+        href="{% url 'student-register' %}"
+        class="btn"
+        style="width: 100%; text-align: center"
+        >S'inscrire</a
+      >
     </div>
-    <div class="features-grid">
-        <!-- Students -->
-        <div class="feature-card" style="border-left: 4px solid #138d73; border-top: none;">
-            <h3>Les Étudiants</h3>
-            <p><strong>Accédez à des offres exclusives</strong></p>
-            <ul class="feature-list">
-                <li>Inscription simple et rapide (2 min)</li>
-                <li>Scanner un QR code ou saisir un code</li>
-                <li>Confirmation instantanée</li>
-                <li>Accès à des services partenaires</li>
-            </ul>
-            <a href="{% url 'student-register' %}" class="btn" style="width: 100%; text-align: center;">S'inscrire</a>
-        </div>
 
-        <!-- Schools/Institutions -->
-        <div class="feature-card" style="border-left: 4px solid #27ae60; border-top: none;">
-            <h3>Les Écoles</h3>
-            <p><strong>Connectez vos étudiants aux partenaires</strong></p>
-            <ul class="feature-list">
-                <li>Plateforme d'affiliation gratuite</li>
-                <li>Gestion centralisée des partenaires</li>
-                <li>Suivi des performances</li>
-                <li>Support dédié</li>
-            </ul>
-            <a href="mailto:contact@affiliation-irl.fr" class="btn" style="width: 100%; text-align: center;">Nous Contacter</a>
-        </div>
-
-        <!-- Partners -->
-        <div class="feature-card" style="border-left: 4px solid #e74c3c; border-top: none;">
-            <h3>Les Partenaires</h3>
-            <p><strong>Générez des revenus avec nos étudiants</strong></p>
-            <ul class="feature-list">
-                <li>Commission pour chaque inscription</li>
-                <li>QR code personnalisé à afficher</li>
-                <li>Dashboard de suivi en temps réel</li>
-            </ul>
-            <a href="{% url 'partnership-request' %}" class="btn" style="width: 100%; text-align: center;">Connexion Partenaire</a>
-        </div>
+    <!-- Schools/Institutions -->
+    <div
+      class="feature-card"
+      style="border-left: 4px solid #27ae60; border-top: none"
+    >
+      <h3>Les Écoles</h3>
+      <p><strong>Connectez vos étudiants aux partenaires</strong></p>
+      <ul class="feature-list">
+        <li>Plateforme d'affiliation gratuite</li>
+        <li>Gestion centralisée des partenaires</li>
+        <li>Suivi des performances</li>
+        <li>Support dédié</li>
+      </ul>
+      <a
+        href="mailto:contact@affiliation-irl.fr"
+        class="btn"
+        style="width: 100%; text-align: center"
+        >Nous Contacter</a
+      >
     </div>
+
+    <!-- Partners -->
+    <div
+      class="feature-card"
+      style="border-left: 4px solid #e74c3c; border-top: none"
+    >
+      <h3>Les Partenaires</h3>
+      <p><strong>Générez des revenus avec nos étudiants</strong></p>
+      <ul class="feature-list">
+        <li>Commission pour chaque inscription</li>
+        <li>QR code personnalisé à afficher</li>
+        <li>Dashboard de suivi en temps réel</li>
+      </ul>
+      <a
+        href="{% url 'partnership-request' %}"
+        class="btn"
+        style="width: 100%; text-align: center"
+        >Connexion Partenaire</a
+      >
+    </div>
+  </div>
 </div>
 
 <!-- Why Partners Earn -->
-<div class="section-title" style="margin-top: 40px;">
-    <h2>Pourquoi les Partenaires Gagnent</h2>
-    <p>Une opportunité réelle de monétiser votre audience étudiante</p>
+<div class="section-title" style="margin-top: 40px">
+  <h2>Pourquoi les Partenaires Gagnent</h2>
+  <p>Une opportunité réelle de monétiser votre audience étudiante</p>
 </div>
 
-<div class="features-grid" style="margin-bottom: 40px;">
-    <div class="feature-card" style="border-top: 4px solid #e74c3c;">
-        <h3>Revenue Passif</h3>
-        <p>Gagnez une commission automatique pour chaque étudiant inscrit via votre QR code. Sans effort supplémentaire.</p>
-    </div>
-    <div class="feature-card" style="border-top: 4px solid #f39c12;">
-        <h3>Audience Qualifiée</h3>
-        <p>Touchez directement des étudiants intéressés. Pas de coûts publicitaires cachés, juste des résultats.</p>
-    </div>
-    <div class="feature-card" style="border-top: 4px solid #9b59b6;">
-        <h3>Transparence Totale</h3>
-        <p>Dashboard en temps réel. Suivez chaque inscription, chaque commission. Aucun doute sur vos revenus.</p>
-    </div>
+<div class="features-grid" style="margin-bottom: 40px">
+  <div class="feature-card" style="border-top: 4px solid #e74c3c">
+    <h3>Revenue Passif</h3>
+    <p>
+      Gagnez une commission automatique pour chaque étudiant inscrit via votre
+      QR code. Sans effort supplémentaire.
+    </p>
+  </div>
+  <div class="feature-card" style="border-top: 4px solid #f39c12">
+    <h3>Audience Qualifiée</h3>
+    <p>
+      Touchez directement des étudiants intéressés. Pas de coûts publicitaires
+      cachés, juste des résultats.
+    </p>
+  </div>
+  <div class="feature-card" style="border-top: 4px solid #9b59b6">
+    <h3>Transparence Totale</h3>
+    <p>
+      Dashboard en temps réel. Suivez chaque inscription, chaque commission.
+      Aucun doute sur vos revenus.
+    </p>
+  </div>
 </div>
 
 <!-- How It Works Steps -->
 <div class="how-it-works">
-    <h2>Comment la Trinité Fonctionne</h2>
-    <div class="steps-container">
-        <div class="step">
-            <div class="step-number">1</div>
-            <h4>École Onboarde</h4>
-            <p>L'école rejoint la plateforme et configure ses partenaires</p>
-        </div>
-        <div class="step">
-            <div class="step-number">2</div>
-            <h4>Partenaire S'inscrit</h4>
-            <p>Les partenaires reçoivent un code unique et un QR code</p>
-        </div>
-        <div class="step">
-            <div class="step-number">3</div>
-            <h4>Étudiant Scanne</h4>
-            <p>Les étudiants scannent et s'inscrivent en 2 minutes</p>
-        </div>
-        <div class="step">
-            <div class="step-number">4</div>
-            <h4>Données Partagées</h4>
-            <p>L'école voit les données, le partenaire suit ses leads</p>
-        </div>
-        <div class="step">
-            <div class="step-number">5</div>
-            <h4>Partenaire Gagne</h4>
-            <p>Commission automatique versée pour chaque inscription</p>
-        </div>
+  <h2>Comment la Trinité Fonctionne</h2>
+  <div class="steps-container">
+    <div class="step">
+      <div class="step-number">1</div>
+      <h4>École Onboarde</h4>
+      <p>L'école rejoint la plateforme et configure ses partenaires</p>
     </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <h4>Partenaire S'inscrit</h4>
+      <p>Les partenaires reçoivent un code unique et un QR code</p>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <h4>Étudiant Scanne</h4>
+      <p>Les étudiants scannent et s'inscrivent en 2 minutes</p>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <h4>Données Partagées</h4>
+      <p>L'école voit les données, le partenaire suit ses leads</p>
+    </div>
+    <div class="step">
+      <div class="step-number">5</div>
+      <h4>Partenaire Gagne</h4>
+      <p>Commission automatique versée pour chaque inscription</p>
+    </div>
+  </div>
 </div>
 
 <!-- Partner Opportunity Highlight -->
-<div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 40px; border-radius: 8px; margin-bottom: 40px; text-align: center;">
-    <h2 style="color: white; margin-bottom: 16px;">Une Opportunité Financière Réelle</h2>
-    <p style="font-size: 18px; margin-bottom: 24px; opacity: 0.95;">
-        Chaque partenaire peut transformer son local en source de revenus. Un étudiant qui scanne votre QR code et qui s'inscrit = une commission automatique dans votre compte.
-    </p>
-    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 150px;">
-            <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">0%</div>
-            <div style="font-size: 14px;">Coûts d'installation</div>
-        </div>
-        <div style="flex: 1; min-width: 150px;">
-            <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">∞</div>
-            <div style="font-size: 14px;">Potentiel de revenus</div>
-        </div>
-        <div style="flex: 1; min-width: 150px;">
-            <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">24/7</div>
-            <div style="font-size: 14px;">QR code actif</div>
-        </div>
+<div
+  style="
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    text-align: center;
+  "
+>
+  <h2 style="color: white; margin-bottom: 16px">
+    Une Opportunité Financière Réelle
+  </h2>
+  <p style="font-size: 18px; margin-bottom: 24px; opacity: 0.95">
+    Chaque partenaire peut transformer son local en source de revenus. Un
+    étudiant qui scanne votre QR code et qui s'inscrit = une commission
+    automatique dans votre compte.
+  </p>
+  <div
+    style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap"
+  >
+    <div style="flex: 1; min-width: 150px">
+      <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px">
+        0%
+      </div>
+      <div style="font-size: 14px">Coûts d'installation</div>
     </div>
+    <div style="flex: 1; min-width: 150px">
+      <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px">
+        ∞
+      </div>
+      <div style="font-size: 14px">Potentiel de revenus</div>
+    </div>
+    <div style="flex: 1; min-width: 150px">
+      <div style="font-size: 32px; font-weight: bold; margin-bottom: 8px">
+        24/7
+      </div>
+      <div style="font-size: 14px">QR code actif</div>
+    </div>
+  </div>
 </div>
 
 <!-- Key Benefits -->
-<div class="section-title" style="margin-bottom: 32px;">
-    <h2>Avantages pour Tous</h2>
-    <p>Un système gagnant-gagnant-gagnant</p>
+<div class="section-title" style="margin-bottom: 32px">
+  <h2>Avantages pour Tous</h2>
+  <p>Un système gagnant-gagnant-gagnant</p>
 </div>
 
-<div class="features-grid" style="margin-bottom: 40px;">
-    <div class="feature-card" style="border-top: 4px solid #138d73;">
-        <h3>Rapide & Simple</h3>
-        <p>Inscription en 2 minutes, aucune complication. Pas de documents à envoyer.</p>
-    </div>
-    <div class="feature-card" style="border-top: 4px solid #3498db;">
-        <h3>Scan & Go</h3>
-        <p>Un simple scan du QR code depuis le téléphone. Immédiat et sans frictions.</p>
-    </div>
-    <div class="feature-card" style="border-top: 4px solid #e74c3c;">
-        <h3>Sécurisé & Transparent</h3>
-        <p>Vos données protégées. Chaque transaction tracée et vérifiable en temps réel.</p>
-    </div>
+<div class="features-grid" style="margin-bottom: 40px">
+  <div class="feature-card" style="border-top: 4px solid #138d73">
+    <h3>Rapide & Simple</h3>
+    <p>
+      Inscription en 2 minutes, aucune complication. Pas de documents à envoyer.
+    </p>
+  </div>
+  <div class="feature-card" style="border-top: 4px solid #3498db">
+    <h3>Scan & Go</h3>
+    <p>
+      Un simple scan du QR code depuis le téléphone. Immédiat et sans frictions.
+    </p>
+  </div>
+  <div class="feature-card" style="border-top: 4px solid #e74c3c">
+    <h3>Sécurisé & Transparent</h3>
+    <p>
+      Vos données protégées. Chaque transaction tracée et vérifiable en temps
+      réel.
+    </p>
+  </div>
 </div>
 
 <!-- CTA Section -->
 <div class="cta-section">
-    <h2>Prêt à Rejoindre la Trinité?</h2>
-    <p>Choisissez votre rôle et commencez dès aujourd'hui</p>
-    <div class="hero-buttons">
-        <a href="{% url 'student-register' %}" class="btn-hero primary">Inscription Étudiant</a>
-        <a href="{% url 'partnership-request' %}" class="btn-hero secondary">Devenir Partenaire</a>
-    </div>
+  <h2>Prêt à Rejoindre la Trinité?</h2>
+  <p>Choisissez votre rôle et commencez dès aujourd'hui</p>
+  <div class="hero-buttons">
+    <a href="{% url 'student-register' %}" class="btn-hero primary"
+      >Inscription Étudiant</a
+    >
+    <a href="{% url 'partnership-request' %}" class="btn-hero secondary"
+      >Devenir Partenaire</a
+    >
+  </div>
 </div>
 
 {% endblock %}
