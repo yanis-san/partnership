@@ -1,869 +1,964 @@
-{% extends "base.html" %}
-
-{% block title %}Inscription - Affiliation Librairies{% endblock %}
-
-{% block content %}
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<!-- Fallback si le CDN échoue -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const debugEl = document.getElementById('debug-alpine');
-        if (typeof Alpine === 'undefined') {
-            console.error('Alpine.js failed to load!');
-            debugEl.textContent = '❌ FAIL';
-            debugEl.style.color = 'red';
-            document.getElementById('debug-info').style.display = 'block';
-        } else {
-            console.log('Alpine.js loaded successfully');
-            debugEl.textContent = '✓ OK';
-            debugEl.style.color = 'green';
-        }
-    });
-</script>
+{% extends "base.html" %} {% block title %}Inscription - Affiliation
+Librairies{% endblock %} {% block content %}
 
 <style>
-    * {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background: #fafafa;
+  }
+
+  .form-step {
+    display: none;
+    opacity: 0;
+  }
+
+  .form-step.active {
+    display: block;
+    opacity: 1 !important;
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+    padding: 0 20px;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 3px;
+    background: #e8e8e8;
+    border-radius: 1.5px;
+    transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .progress-step.completed {
+    background: #000;
+  }
+
+  .progress-step.active {
+    background: #000;
+  }
+
+  .input-group {
+    margin-bottom: 32px;
+  }
+
+  .input-group label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    color: #1a1a1a;
+    text-transform: uppercase;
+  }
+
+  .input-group input,
+  .input-group select {
+    width: 100%;
+    padding: 14px 0;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    color: #000 !important;
+    background: transparent !important;
+    transition: border-color 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Custom Select */
+  .custom-select-wrapper {
+    position: relative;
+    display: block;
+  }
+
+  .custom-select-wrapper select {
+    display: none;
+  }
+
+  .custom-select {
+    display: block;
+    width: 100%;
+    padding: 14px 0;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    color: #1a1a1a;
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 30px;
+  }
+
+  .custom-select:hover {
+    border-bottom-color: #999;
+  }
+
+  .custom-select.active {
+    border-bottom-color: #000;
+    border-bottom-width: 2px;
+  }
+
+  .custom-select::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transition: transform 0.3s ease;
+  }
+
+  .custom-select.active::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  .custom-select-value {
+    flex: 1;
+    color: #1a1a1a;
+  }
+
+  .custom-select-value.placeholder {
+    color: #999;
+  }
+
+  .custom-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin-top: -2px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+  }
+
+  .custom-select-dropdown.active {
+    display: block;
+  }
+
+  .custom-select-option {
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1a1a1a;
+    font-size: 16px;
+    background: white;
+  }
+
+  .custom-select-option:hover {
+    background: #e8f5f2;
+    color: #138d73;
+    padding-left: 20px;
+  }
+
+  .custom-select-option.selected {
+    background: #d4e8e2;
+    color: #0f7a63;
+    font-weight: 500;
+  }
+
+  .custom-select-option.selected:hover {
+    background: #c8ddd5;
+  }
+
+  .custom-select-option.selected::before {
+    content: "✓ ";
+    color: #0f7a63;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
+  .input-group input:focus,
+  .input-group select:focus {
+    outline: none;
+    border-bottom-color: #000;
+    border-bottom-width: 2px;
+    padding-bottom: 13px;
+  }
+
+  .input-group input::placeholder {
+    color: #999;
+    font-weight: 400;
+  }
+
+  .input-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  .input-hint {
+    color: #888;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: 400;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 48px;
+  }
+
+  .btn-next,
+  .btn-submit {
+    flex: 1;
+    padding: 14px 24px;
+    background: #138d73;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    box-shadow: 0 2px 8px rgba(19, 141, 115, 0.2);
+  }
+
+  .btn-next:hover:not(:disabled),
+  .btn-submit:hover:not(:disabled) {
+    background: #0f7a63;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(19, 141, 115, 0.3);
+  }
+
+  .btn-next:active:not(:disabled),
+  .btn-submit:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-next:disabled {
+    background: #d0d0d0;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-prev {
+    flex: 1;
+    padding: 14px 24px;
+    background: white;
+    color: #1a1a1a;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+  }
+
+  .btn-prev:hover {
+    background: #f8f8f8;
+    border-color: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-prev:active {
+    transform: translateY(0);
+  }
+
+  .card {
+    background: white;
+    padding: 48px 40px;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: 400;
+    color: #000;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .qr-badge {
+    display: inline-block;
+    background: #000;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .card {
+      padding: 32px 24px;
+      margin-bottom: 16px;
     }
 
-    body {
-        background: #fafafa;
-    }
-
-    .form-step {
-        display: none;
-        opacity: 0;
-    }
-
-    .form-step.active {
-        display: block;
-        opacity: 1 !important;
-        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(16px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    h2 {
+      font-size: 22px;
     }
 
     .progress-bar {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 40px;
-        padding: 0 20px;
-    }
-
-    .progress-step {
-        flex: 1;
-        height: 3px;
-        background: #e8e8e8;
-        border-radius: 1.5px;
-        transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .progress-step.completed {
-        background: #000;
-    }
-
-    .progress-step.active {
-        background: #000;
+      padding: 0 16px;
+      margin-bottom: 32px;
     }
 
     .input-group {
-        margin-bottom: 32px;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 12px;
-        font-size: 15px;
-        font-weight: 500;
-        letter-spacing: 0.3px;
-        color: #1a1a1a;
-        text-transform: uppercase;
-    }
-
-    .input-group input,
-    .input-group select {
-        width: 100%;
-        padding: 14px 0;
-        border: none;
-        border-bottom: 2px solid #ddd;
-        font-size: 16px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: #000 !important;
-        background: transparent !important;
-        transition: border-color 0.3s ease;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-
-    /* Custom Select */
-    .custom-select-wrapper {
-        position: relative;
-        display: block;
-    }
-
-    .custom-select-wrapper select {
-        display: none;
-    }
-
-    .custom-select {
-        display: block;
-        width: 100%;
-        padding: 14px 0;
-        border: none;
-        border-bottom: 2px solid #ddd;
-        font-size: 16px;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        color: #1a1a1a;
-        background: transparent;
-        cursor: pointer;
-        user-select: none;
-        transition: border-color 0.3s ease;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-right: 30px;
-    }
-
-    .custom-select:hover {
-        border-bottom-color: #999;
-    }
-
-    .custom-select.active {
-        border-bottom-color: #000;
-        border-bottom-width: 2px;
-    }
-
-    .custom-select::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 16px;
-        height: 16px;
-        background: linear-gradient(135deg, #138d73 0%, #0f7a63 100%);
-        clip-path: polygon(0 0, 100% 0, 50% 100%);
-        transition: transform 0.3s ease;
-    }
-
-    .custom-select.active::after {
-        transform: translateY(-50%) rotate(180deg);
-    }
-
-    .custom-select-value {
-        flex: 1;
-        color: #1a1a1a;
-    }
-
-    .custom-select-value.placeholder {
-        color: #999;
-    }
-
-    .custom-select-dropdown {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 2px solid #ddd;
-        border-top: none;
-        border-radius: 0 0 4px 4px;
-        margin-top: -2px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        display: none;
-    }
-
-    .custom-select-dropdown.active {
-        display: block;
-    }
-
-    .custom-select-option {
-        padding: 14px 16px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        color: #1a1a1a;
-        font-size: 16px;
-        background: white;
-    }
-
-    .custom-select-option:hover {
-        background: #e8f5f2;
-        color: #138d73;
-        padding-left: 20px;
-    }
-
-    .custom-select-option.selected {
-        background: #d4e8e2;
-        color: #0f7a63;
-        font-weight: 500;
-    }
-
-    .custom-select-option.selected:hover {
-        background: #c8ddd5;
-    }
-
-    .custom-select-option.selected::before {
-        content: '✓ ';
-        color: #0f7a63;
-        font-weight: bold;
-        margin-right: 4px;
-    }
-
-    .input-group input:focus,
-    .input-group select:focus {
-        outline: none;
-        border-bottom-color: #000;
-        border-bottom-width: 2px;
-        padding-bottom: 13px;
-    }
-
-    .input-group input::placeholder {
-        color: #999;
-        font-weight: 400;
-    }
-
-    .input-error {
-        color: #d32f2f;
-        font-size: 13px;
-        margin-top: 8px;
-        font-weight: 500;
-        letter-spacing: 0.2px;
-    }
-
-    .input-hint {
-        color: #888;
-        font-size: 13px;
-        margin-top: 8px;
-        font-weight: 400;
+      margin-bottom: 24px;
     }
 
     .btn-group {
-        display: flex;
-        gap: 12px;
-        margin-top: 48px;
+      margin-top: 40px;
+      gap: 8px;
     }
 
     .btn-next,
-    .btn-submit {
-        flex: 1;
-        padding: 14px 24px;
-        background: #138d73;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        box-shadow: 0 2px 8px rgba(19, 141, 115, 0.2);
-    }
-
-    .btn-next:hover:not(:disabled),
-    .btn-submit:hover:not(:disabled) {
-        background: #0f7a63;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(19, 141, 115, 0.3);
-    }
-
-    .btn-next:active:not(:disabled),
-    .btn-submit:active:not(:disabled) {
-        transform: translateY(0);
-    }
-
-    .btn-next:disabled {
-        background: #d0d0d0;
-        color: #888;
-        cursor: not-allowed;
-        transform: none;
-    }
-
+    .btn-submit,
     .btn-prev {
-        flex: 1;
-        padding: 14px 24px;
-        background: white;
-        color: #1a1a1a;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 13px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 12px 16px;
+      font-size: 13px;
     }
+  }
 
-    .btn-prev:hover {
-        background: #f8f8f8;
-        border-color: #1a1a1a;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-    }
+  /* Styled select arrow */
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23138d73' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 14px;
+    padding-right: 32px !important;
+    background-color: transparent !important;
+  }
 
-    .btn-prev:active {
-        transform: translateY(0);
-    }
-
-    .card {
-        background: white;
-        padding: 48px 40px;
-        border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        margin-bottom: 24px;
-    }
-
-
-    h2 {
-        font-size: 28px;
-        font-weight: 400;
-        color: #000;
-        margin: 0 0 8px 0;
-        letter-spacing: -0.5px;
-    }
-
-    .subtitle {
-        color: #666;
-        font-size: 14px;
-        margin: 0;
-        font-weight: 400;
-    }
-
-    .qr-badge {
-        display: inline-block;
-        background: #000;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 3px;
-        font-size: 11px;
-        font-weight: 600;
-        margin-left: 12px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(-8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-        .card {
-            padding: 32px 24px;
-            margin-bottom: 16px;
-        }
-
-        h2 {
-            font-size: 22px;
-        }
-
-        .progress-bar {
-            padding: 0 16px;
-            margin-bottom: 32px;
-        }
-
-        .input-group {
-            margin-bottom: 24px;
-        }
-
-        .btn-group {
-            margin-top: 40px;
-            gap: 8px;
-        }
-
-        .btn-next,
-        .btn-submit,
-        .btn-prev {
-            padding: 12px 16px;
-            font-size: 13px;
-        }
-    }
-
-    /* Styled select arrow */
-    select {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23138d73' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 8px center;
-        background-size: 14px;
-        padding-right: 32px !important;
-        background-color: transparent !important;
-    }
-
-    select:focus {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23000' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
-    }
+  select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath fill='%23000' d='M7 10L2 5h10z'/%3E%3C/svg%3E");
+  }
 </style>
 
 <div class="card" x-data="registrationForm()" @submit.prevent="submitForm()">
-    <h2 style="margin-bottom: 32px; font-size: 24px; font-weight: 300;">
-        Inscription
-        {% if code_from_qr %}
-            <span class="qr-badge">QR Code</span>
-        {% endif %}
-    </h2>
-
-    <!-- MODE AUTOMATIQUE (QR Code) -->
-    {% if code_from_qr %}
-        <!-- Barre de progression: 4 étapes -->
-        <div class="progress-bar">
-            <div class="progress-step" :class="{'completed': step > 1, 'active': step === 1}"></div>
-            <div class="progress-step" :class="{'completed': step > 2, 'active': step === 2}"></div>
-            <div class="progress-step" :class="{'completed': step > 3, 'active': step === 3}"></div>
-            <div class="progress-step" :class="{'completed': step > 4, 'active': step === 4}"></div>
-        </div>
-
-        <form method="post" @submit.prevent="handleSubmit($event)">
-            {% csrf_token %}
-            <input type="hidden" name="referral_code" value="{{ code_from_qr }}">
-
-            <!-- Étape 1: Nom complet -->
-            <div class="form-step" :class="{'active': step === 1}">
-                <div class="input-group">
-                    <label for="full_name">Nom complet</label>
-                    <input type="text"
-                        id="full_name"
-                        name="full_name"
-                        x-model="formData.full_name"
-                        @keyup.enter="nextStep()"
-                        placeholder="Ahmed Karim"
-                        maxlength="200"
-                        required
-                        autofocus>
-                    <template x-if="errors.full_name">
-                        <div class="input-error" x-text="errors.full_name[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!formData.full_name">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 2: Email -->
-            <div class="form-step" :class="{'active': step === 2}">
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email"
-                        id="email"
-                        name="email"
-                        x-model="formData.email"
-                        @keyup.enter="nextStep()"
-                        placeholder="ahmed@example.com"
-                        maxlength="254"
-                        required
-                        autofocus>
-                    <template x-if="errors.email">
-                        <div class="input-error" x-text="errors.email[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!isValidEmail(formData.email)">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 3: Téléphone -->
-            <div class="form-step" :class="{'active': step === 3}">
-                <div class="input-group">
-                    <label for="phone">Téléphone</label>
-                    <input type="tel"
-                        id="phone"
-                        name="phone"
-                        x-model="formData.phone"
-                        @keyup.enter="nextStep()"
-                        placeholder="+213 661 234 567"
-                        maxlength="20"
-                        required
-                        autofocus>
-                    <template x-if="errors.phone">
-                        <div class="input-error" x-text="errors.phone[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!formData.phone">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 4: Programme -->
-            <div class="form-step" :class="{'active': step === 4}">
-                <div class="input-group">
-                    <label for="program">Programme</label>
-                    <div class="custom-select-wrapper" id="program-select">
-                        <select name="program" id="program" x-model="formData.program" required>
-                            <option value="">Choisir un programme</option>
-                            {% for program in programs %}
-                            <option value="{{ program.id }}">{{ program.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="custom-select">
-                            <div class="custom-select-value placeholder">Choisir un programme</div>
-                        </div>
-                        <div class="custom-select-dropdown">
-                            <div class="custom-select-option" data-value="">Choisir un programme</div>
-                            {% for program in programs %}
-                            <div class="custom-select-option" data-value="{{ program.id }}">{{ program.name }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="submit" class="btn-submit">
-                        S'inscrire
-                    </button>
-                </div>
-            </div>
-
-        </form>
-
-    <!-- MODE MANUEL (Saisir le code) -->
-    {% else %}
-        <!-- Barre de progression: 5 étapes -->
-        <div class="progress-bar">
-            <div class="progress-step" :class="{'completed': step > 1, 'active': step === 1}"></div>
-            <div class="progress-step" :class="{'completed': step > 2, 'active': step === 2}"></div>
-            <div class="progress-step" :class="{'completed': step > 3, 'active': step === 3}"></div>
-            <div class="progress-step" :class="{'completed': step > 4, 'active': step === 4}"></div>
-            <div class="progress-step" :class="{'completed': step > 5, 'active': step === 5}"></div>
-        </div>
-
-        <form method="post" @submit.prevent="handleSubmit($event)">
-            {% csrf_token %}
-
-            <!-- Étape 1: Nom complet -->
-            <div class="form-step" :class="{'active': step === 1}">
-                <div class="input-group">
-                    <label for="full_name">Nom complet</label>
-                    <input type="text"
-                        id="full_name"
-                        name="full_name"
-                        x-model="formData.full_name"
-                        @keyup.enter="nextStep()"
-                        placeholder="Ahmed Karim"
-                        maxlength="200"
-                        required
-                        autofocus>
-                    <template x-if="errors.full_name">
-                        <div class="input-error" x-text="errors.full_name[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!formData.full_name">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 2: Email -->
-            <div class="form-step" :class="{'active': step === 2}">
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email"
-                        id="email"
-                        name="email"
-                        x-model="formData.email"
-                        @keyup.enter="nextStep()"
-                        placeholder="ahmed@example.com"
-                        maxlength="254"
-                        required
-                        autofocus>
-                    <template x-if="errors.email">
-                        <div class="input-error" x-text="errors.email[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!isValidEmail(formData.email)">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 3: Téléphone -->
-            <div class="form-step" :class="{'active': step === 3}">
-                <div class="input-group">
-                    <label for="phone">Téléphone</label>
-                    <input type="tel"
-                        id="phone"
-                        name="phone"
-                        x-model="formData.phone"
-                        @keyup.enter="nextStep()"
-                        placeholder="+213 661 234 567"
-                        maxlength="20"
-                        required
-                        autofocus>
-                    <template x-if="errors.phone">
-                        <div class="input-error" x-text="errors.phone[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="button" class="btn-next" @click="nextStep()" :disabled="!formData.phone">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 4: Programme -->
-            <div class="form-step" :class="{'active': step === 4}">
-                <div class="input-group">
-                    <label for="program">Programme</label>
-                    <div class="custom-select-wrapper" id="program-select">
-                        <select name="program" id="program" x-model="formData.program" required>
-                            <option value="">Choisir un programme</option>
-                            {% for program in programs %}
-                            <option value="{{ program.id }}">{{ program.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="custom-select">
-                            <div class="custom-select-value placeholder">Choisir un programme</div>
-                        </div>
-                        <div class="custom-select-dropdown">
-                            <div class="custom-select-option" data-value="">Choisir un programme</div>
-                            {% for program in programs %}
-                            <div class="custom-select-option" data-value="{{ program.id }}">{{ program.name }}</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="button" class="btn-next" @click="nextStep()">
-                        Suivant
-                    </button>
-                </div>
-            </div>
-
-            <!-- Étape 5: Code Partenaire -->
-            <div class="form-step" :class="{'active': step === 5}">
-                <div class="input-group">
-                    <label for="referral_code">Code Partenaire</label>
-                    <input type="text"
-                        id="referral_code"
-                        name="referral_code"
-                        x-model="formData.referral_code"
-                        @keyup.enter="submitForm()"
-                        placeholder="LIB4F6"
-                        maxlength="100"
-                        autocomplete="off"
-                        required
-                        style="text-transform: uppercase;"
-                        autofocus>
-                    <p class="input-hint">Vous l'avez reçu à la librairie partenaire</p>
-                    <template x-if="errors.referral_code">
-                        <div class="input-error" x-text="errors.referral_code[0]"></div>
-                    </template>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-prev" @click="previousStep()">Retour</button>
-                    <button type="submit" class="btn-submit" :disabled="!formData.referral_code">
-                        S'inscrire
-                    </button>
-                </div>
-            </div>
-
-        </form>
+  <h2 style="margin-bottom: 32px; font-size: 24px; font-weight: 300">
+    Inscription {% if code_from_qr %}
+    <span class="qr-badge">QR Code</span>
     {% endif %}
+  </h2>
 
+  <!-- MODE AUTOMATIQUE (QR Code) -->
+  {% if code_from_qr %}
+  <!-- Barre de progression: 4 étapes -->
+  <div class="progress-bar">
+    <div
+      class="progress-step"
+      :class="{'completed': step > 1, 'active': step === 1}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 2, 'active': step === 2}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 3, 'active': step === 3}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 4, 'active': step === 4}"
+    ></div>
+  </div>
+
+  <form method="post" @submit.prevent="handleSubmit($event)">
+    {% csrf_token %}
+    <input type="hidden" name="referral_code" value="{{ code_from_qr }}" />
+
+    <!-- Étape 1: Nom complet -->
+    <div class="form-step" :class="{'active': step === 1}">
+      <div class="input-group">
+        <label for="full_name">Nom complet</label>
+        <input
+          type="text"
+          id="full_name"
+          name="full_name"
+          x-model="formData.full_name"
+          @keyup.enter="nextStep()"
+          placeholder="Ahmed Karim"
+          maxlength="200"
+          required
+          autofocus
+        />
+        <template x-if="errors.full_name">
+          <div class="input-error" x-text="errors.full_name[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!formData.full_name"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 2: Email -->
+    <div class="form-step" :class="{'active': step === 2}">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          x-model="formData.email"
+          @keyup.enter="nextStep()"
+          placeholder="ahmed@example.com"
+          maxlength="254"
+          required
+          autofocus
+        />
+        <template x-if="errors.email">
+          <div class="input-error" x-text="errors.email[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!isValidEmail(formData.email)"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 3: Téléphone -->
+    <div class="form-step" :class="{'active': step === 3}">
+      <div class="input-group">
+        <label for="phone">Téléphone</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          x-model="formData.phone"
+          @keyup.enter="nextStep()"
+          placeholder="+213 661 234 567"
+          maxlength="20"
+          required
+          autofocus
+        />
+        <template x-if="errors.phone">
+          <div class="input-error" x-text="errors.phone[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!formData.phone"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 4: Programme -->
+    <div class="form-step" :class="{'active': step === 4}">
+      <div class="input-group">
+        <label for="program">Programme</label>
+        <div class="custom-select-wrapper" id="program-select">
+          <select
+            name="program"
+            id="program"
+            x-model="formData.program"
+            required
+          >
+            <option value="">Choisir un programme</option>
+            {% for program in programs %}
+            <option value="{{ program.id }}">{{ program.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="custom-select">
+            <div class="custom-select-value placeholder">
+              Choisir un programme
+            </div>
+          </div>
+          <div class="custom-select-dropdown">
+            <div class="custom-select-option" data-value="">
+              Choisir un programme
+            </div>
+            {% for program in programs %}
+            <div class="custom-select-option" data-value="{{ program.id }}">
+              {{ program.name }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button type="submit" class="btn-submit">S'inscrire</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- MODE MANUEL (Saisir le code) -->
+  {% else %}
+  <!-- Barre de progression: 5 étapes -->
+  <div class="progress-bar">
+    <div
+      class="progress-step"
+      :class="{'completed': step > 1, 'active': step === 1}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 2, 'active': step === 2}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 3, 'active': step === 3}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 4, 'active': step === 4}"
+    ></div>
+    <div
+      class="progress-step"
+      :class="{'completed': step > 5, 'active': step === 5}"
+    ></div>
+  </div>
+
+  <form method="post" @submit.prevent="handleSubmit($event)">
+    {% csrf_token %}
+
+    <!-- Étape 1: Nom complet -->
+    <div class="form-step" :class="{'active': step === 1}">
+      <div class="input-group">
+        <label for="full_name">Nom complet</label>
+        <input
+          type="text"
+          id="full_name"
+          name="full_name"
+          x-model="formData.full_name"
+          @keyup.enter="nextStep()"
+          placeholder="Ahmed Karim"
+          maxlength="200"
+          required
+          autofocus
+        />
+        <template x-if="errors.full_name">
+          <div class="input-error" x-text="errors.full_name[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!formData.full_name"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 2: Email -->
+    <div class="form-step" :class="{'active': step === 2}">
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          x-model="formData.email"
+          @keyup.enter="nextStep()"
+          placeholder="ahmed@example.com"
+          maxlength="254"
+          required
+          autofocus
+        />
+        <template x-if="errors.email">
+          <div class="input-error" x-text="errors.email[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!isValidEmail(formData.email)"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 3: Téléphone -->
+    <div class="form-step" :class="{'active': step === 3}">
+      <div class="input-group">
+        <label for="phone">Téléphone</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          x-model="formData.phone"
+          @keyup.enter="nextStep()"
+          placeholder="+213 661 234 567"
+          maxlength="20"
+          required
+          autofocus
+        />
+        <template x-if="errors.phone">
+          <div class="input-error" x-text="errors.phone[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button
+          type="button"
+          class="btn-next"
+          @click="nextStep()"
+          :disabled="!formData.phone"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 4: Programme -->
+    <div class="form-step" :class="{'active': step === 4}">
+      <div class="input-group">
+        <label for="program">Programme</label>
+        <div class="custom-select-wrapper" id="program-select">
+          <select
+            name="program"
+            id="program"
+            x-model="formData.program"
+            required
+          >
+            <option value="">Choisir un programme</option>
+            {% for program in programs %}
+            <option value="{{ program.id }}">{{ program.name }}</option>
+            {% endfor %}
+          </select>
+          <div class="custom-select">
+            <div class="custom-select-value placeholder">
+              Choisir un programme
+            </div>
+          </div>
+          <div class="custom-select-dropdown">
+            <div class="custom-select-option" data-value="">
+              Choisir un programme
+            </div>
+            {% for program in programs %}
+            <div class="custom-select-option" data-value="{{ program.id }}">
+              {{ program.name }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button type="button" class="btn-next" @click="nextStep()">
+          Suivant
+        </button>
+      </div>
+    </div>
+
+    <!-- Étape 5: Code Partenaire -->
+    <div class="form-step" :class="{'active': step === 5}">
+      <div class="input-group">
+        <label for="referral_code">Code Partenaire</label>
+        <input
+          type="text"
+          id="referral_code"
+          name="referral_code"
+          x-model="formData.referral_code"
+          @keyup.enter="submitForm()"
+          placeholder="LIB4F6"
+          maxlength="100"
+          autocomplete="off"
+          required
+          style="text-transform: uppercase"
+          autofocus
+        />
+        <p class="input-hint">Vous l'avez reçu à la librairie partenaire</p>
+        <template x-if="errors.referral_code">
+          <div class="input-error" x-text="errors.referral_code[0]"></div>
+        </template>
+      </div>
+      <div class="btn-group">
+        <button type="button" class="btn-prev" @click="previousStep()">
+          Retour
+        </button>
+        <button
+          type="submit"
+          class="btn-submit"
+          :disabled="!formData.referral_code"
+        >
+          S'inscrire
+        </button>
+      </div>
+    </div>
+  </form>
+  {% endif %}
 </div>
 
 <script>
-console.log('Script registrationForm starting...');
+  console.log("Script registrationForm starting...");
 
-// Custom Select Handler
-function initCustomSelects() {
-    const selects = document.querySelectorAll('.custom-select-wrapper');
+  // Custom Select Handler
+  function initCustomSelects() {
+    const selects = document.querySelectorAll(".custom-select-wrapper");
 
-    selects.forEach(wrapper => {
-        const selectEl = wrapper.querySelector('select');
-        const customSelect = wrapper.querySelector('.custom-select');
-        const customValue = wrapper.querySelector('.custom-select-value');
-        const dropdown = wrapper.querySelector('.custom-select-dropdown');
-        const options = wrapper.querySelectorAll('.custom-select-option');
+    selects.forEach((wrapper) => {
+      const selectEl = wrapper.querySelector("select");
+      const customSelect = wrapper.querySelector(".custom-select");
+      const customValue = wrapper.querySelector(".custom-select-value");
+      const dropdown = wrapper.querySelector(".custom-select-dropdown");
+      const options = wrapper.querySelectorAll(".custom-select-option");
 
-        // Ouvrir/Fermer le dropdown
-        customSelect.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isActive = dropdown.classList.toggle('active');
-            customSelect.classList.toggle('active', isActive);
+      // Ouvrir/Fermer le dropdown
+      customSelect.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isActive = dropdown.classList.toggle("active");
+        customSelect.classList.toggle("active", isActive);
+      });
+
+      // Sélectionner une option
+      options.forEach((option) => {
+        option.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const value = option.getAttribute("data-value");
+          const text = option.textContent.trim();
+
+          // Mettre à jour le select natif
+          selectEl.value = value;
+
+          // Mettre à jour l'affichage
+          if (value === "") {
+            customValue.textContent = "Choisir un programme";
+            customValue.classList.add("placeholder");
+          } else {
+            customValue.textContent = text;
+            customValue.classList.remove("placeholder");
+          }
+
+          // Mettre à jour les styles des options
+          options.forEach((opt) => {
+            opt.classList.toggle("selected", opt === option);
+          });
+
+          // Fermer le dropdown
+          dropdown.classList.remove("active");
+          customSelect.classList.remove("active");
+
+          // Trigger Alpine.js change
+          selectEl.dispatchEvent(new Event("input", { bubbles: true }));
         });
-
-        // Sélectionner une option
-        options.forEach(option => {
-            option.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const value = option.getAttribute('data-value');
-                const text = option.textContent.trim();
-
-                // Mettre à jour le select natif
-                selectEl.value = value;
-
-                // Mettre à jour l'affichage
-                if (value === '') {
-                    customValue.textContent = 'Choisir un programme';
-                    customValue.classList.add('placeholder');
-                } else {
-                    customValue.textContent = text;
-                    customValue.classList.remove('placeholder');
-                }
-
-                // Mettre à jour les styles des options
-                options.forEach(opt => {
-                    opt.classList.toggle('selected', opt === option);
-                });
-
-                // Fermer le dropdown
-                dropdown.classList.remove('active');
-                customSelect.classList.remove('active');
-
-                // Trigger Alpine.js change
-                selectEl.dispatchEvent(new Event('input', { bubbles: true }));
-            });
-        });
+      });
     });
 
     // Fermer quand on clique ailleurs
-    document.addEventListener('click', () => {
-        selects.forEach(wrapper => {
-            const dropdown = wrapper.querySelector('.custom-select-dropdown');
-            const customSelect = wrapper.querySelector('.custom-select');
-            dropdown.classList.remove('active');
-            customSelect.classList.remove('active');
-        });
+    document.addEventListener("click", () => {
+      selects.forEach((wrapper) => {
+        const dropdown = wrapper.querySelector(".custom-select-dropdown");
+        const customSelect = wrapper.querySelector(".custom-select");
+        dropdown.classList.remove("active");
+        customSelect.classList.remove("active");
+      });
     });
-}
+  }
 
-// Initialiser les custom selects au chargement
-document.addEventListener('DOMContentLoaded', initCustomSelects);
+  // Initialiser les custom selects au chargement
+  document.addEventListener("DOMContentLoaded", initCustomSelects);
 
-function registrationForm() {
-    console.log('registrationForm() called');
+  function registrationForm() {
+    console.log("registrationForm() called");
     const form = {
-        step: 1,
-        formData: {
-            full_name: '{{ form.full_name.value|default:"" }}',
-            email: '{{ form.email.value|default:"" }}',
-            phone: '{{ form.phone.value|default:"" }}',
-            program: '{{ form.program.value|default:"" }}',
-            referral_code: '{{ form.referral_code.value|default:"" }}',
-        },
-        errors: {},
-        init() {
-            console.log('✓ Form initialized! Step:', this.step);
-            console.log('Active steps:', document.querySelectorAll('.form-step.active').length);
+      step: 1,
+      formData: {
+        full_name: '{{ form.full_name.value|default:"" }}',
+        email: '{{ form.email.value|default:"" }}',
+        phone: '{{ form.phone.value|default:"" }}',
+        program: '{{ form.program.value|default:"" }}',
+        referral_code: '{{ form.referral_code.value|default:"" }}',
+      },
+      errors: {},
+      init() {
+        console.log("✓ Form initialized! Step:", this.step);
+        console.log(
+          "Active steps:",
+          document.querySelectorAll(".form-step.active").length
+        );
+        setTimeout(() => {
+          const firstActive = document.querySelector(".form-step.active");
+          console.log("First active step found:", !!firstActive);
+        }, 100);
+      },
+
+      nextStep() {
+        if (this.validateCurrentStep()) {
+          this.step++;
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            // Focus on first input of next step
             setTimeout(() => {
-                const firstActive = document.querySelector('.form-step.active');
-                console.log('First active step found:', !!firstActive);
+              const input = document.querySelector(
+                ".form-step.active input, .form-step.active select"
+              );
+              if (input) input.focus();
             }, 100);
-        },
-
-        nextStep() {
-            if (this.validateCurrentStep()) {
-                this.step++;
-                this.$nextTick(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    // Focus on first input of next step
-                    setTimeout(() => {
-                        const input = document.querySelector('.form-step.active input, .form-step.active select');
-                        if (input) input.focus();
-                    }, 100);
-                });
-            }
-        },
-
-        previousStep() {
-            if (this.step > 1) {
-                this.step--;
-                this.$nextTick(() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setTimeout(() => {
-                        const input = document.querySelector('.form-step.active input, .form-step.active select');
-                        if (input) input.focus();
-                    }, 100);
-                });
-            }
-        },
-
-        validateCurrentStep() {
-            this.errors = {};
-
-            if (this.step === 1) {
-                if (!this.formData.full_name) {
-                    this.errors.full_name = ['Le nom complet est requis'];
-                    return false;
-                }
-            } else if (this.step === 2) {
-                if (!this.isValidEmail(this.formData.email)) {
-                    this.errors.email = ['Entrez un email valide'];
-                    return false;
-                }
-            } else if (this.step === 3) {
-                if (!this.formData.phone) {
-                    this.errors.phone = ['Le téléphone est requis'];
-                    return false;
-                }
-            }
-
-            return true;
-        },
-
-        isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        },
-
-        handleSubmit(event) {
-            event.preventDefault();
-            this.submitForm();
-        },
-
-        submitForm() {
-            // Validation du code pour le mode manuel
-            if (!this.formData.referral_code && this.step === 5) {
-                this.errors.referral_code = ['Le code partenaire est requis'];
-                return;
-            }
-
-            // Soumettre le formulaire
-            const formEl = document.querySelector('form');
-            if (formEl) {
-                formEl.submit();
-            }
+          });
         }
+      },
+
+      previousStep() {
+        if (this.step > 1) {
+          this.step--;
+          this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(() => {
+              const input = document.querySelector(
+                ".form-step.active input, .form-step.active select"
+              );
+              if (input) input.focus();
+            }, 100);
+          });
+        }
+      },
+
+      validateCurrentStep() {
+        this.errors = {};
+
+        if (this.step === 1) {
+          if (!this.formData.full_name) {
+            this.errors.full_name = ["Le nom complet est requis"];
+            return false;
+          }
+        } else if (this.step === 2) {
+          if (!this.isValidEmail(this.formData.email)) {
+            this.errors.email = ["Entrez un email valide"];
+            return false;
+          }
+        } else if (this.step === 3) {
+          if (!this.formData.phone) {
+            this.errors.phone = ["Le téléphone est requis"];
+            return false;
+          }
+        }
+
+        return true;
+      },
+
+      isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      },
+
+      handleSubmit(event) {
+        event.preventDefault();
+        this.submitForm();
+      },
+
+      submitForm() {
+        // Validation du code pour le mode manuel
+        if (!this.formData.referral_code && this.step === 5) {
+          this.errors.referral_code = ["Le code partenaire est requis"];
+          return;
+        }
+
+        // Soumettre le formulaire
+        const formEl = document.querySelector("form");
+        if (formEl) {
+          formEl.submit();
+        }
+      },
     };
-    console.log('Returning form object:', form);
+    console.log("Returning form object:", form);
     return form;
-}
+  }
 </script>
 
 {% endblock %}

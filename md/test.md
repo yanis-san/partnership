@@ -1,4 +1,0 @@
-- Faire les tests des fonctionnalités du site []
-- Voir si c'est optimale niveau UX []
-- Rajouter et optimiser les pages en conséquence []
-- Vérifie l'outillage front end []

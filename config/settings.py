@@ -1,6 +1,7 @@
 import environ
 import os
 from pathlib import Path
+import pymysql
 
 # ============================================
 # LOAD ENVIRONMENT VARIABLES
@@ -87,13 +88,58 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# Supports DATABASE_URL env variable for PostgreSQL, SQLite, MySQL, etc.
 
-DATABASES = {"default": env.db(default="sqlite:///db.sqlite3")}
+DATABASE_URL = env("DATABASE_URL", default="")
+DB_ENGINE = env("DB_ENGINE", default="sqlite")
+IS_MYSQL = DB_ENGINE in ("mysql", "django.db.backends.mysql")
 
-# Connection pooling settings
-DATABASES["default"]["CONN_MAX_AGE"] = 600
+if DATABASE_URL:
+    DATABASES = {"default": env.db("DATABASE_URL")}
+else:
+    if IS_MYSQL:
+        pymysql.install_as_MySQLdb()
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": env("DB_NAME", default="partnership"),
+                "USER": env("DB_USER", default="partnership_user"),
+                "PASSWORD": env("DB_PASSWORD", default=""),
+                "HOST": env("DB_HOST", default="localhost"),
+                "PORT": env("DB_PORT", default="3306"),
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "use_unicode": True,
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+                "TEST": {
+                    "CHARSET": "utf8mb4",
+                    "COLLATION": "utf8mb4_unicode_ci",
+                },
+            }
+        }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / env("DB_NAME", default="db.sqlite3"),
+            }
+        }
+
+# Connection settings
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", default=600)
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
+# Ensure PyMySQL is registered when DATABASE_URL uses MySQL
+if DATABASES["default"].get("ENGINE") == "django.db.backends.mysql":
+    pymysql.install_as_MySQLdb()
+    DATABASES["default"].setdefault(
+        "OPTIONS",
+        {
+            "charset": "utf8mb4",
+            "use_unicode": True,
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    )
 
 
 # Password validation
@@ -128,6 +174,11 @@ USE_TZ = True
 
 STATIC_URL = env("STATIC_URL", default="/static/")
 STATIC_ROOT = BASE_DIR / env("STATIC_ROOT", default="staticfiles")
+
+# Ensure project-level 'static/' is collected (for static/js/*.js)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # WhiteNoise Configuration - STORAGES dict (Django 4.2+)
 STORAGES = {

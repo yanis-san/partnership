@@ -48,7 +48,8 @@ local_settings.py
 
 # Static files
 staticfiles/
-/static/
+# Keep source assets in /static tracked (htmx, alpine, custom JS/CSS). Only ignore collected output.
+static_collect/
 
 # Media
 media/
